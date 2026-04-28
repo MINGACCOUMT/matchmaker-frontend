@@ -1,6 +1,10 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://matchmaker-api-bi2k.onrender.com'
+export const API_BASE_URL = (
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://matchmaker-api-bi2k.onrender.com'
+).replace(/\/$/, '')
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -18,9 +22,7 @@ api.interceptors.request.use(
     }
     return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
 // 响应拦截器
@@ -29,6 +31,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
       window.location.href = '/login'
     }
     return Promise.reject(error)
@@ -39,56 +42,32 @@ export default api
 
 // API 方法
 export const authAPI = {
-  register: async (data) => {
-    try {
-      return await api.post('/api/v1/register', data)
-    } catch (error) {
-      // 临时：如果后端失败，返回模拟数据
-      console.log('注册失败，使用模拟数据', error)
-      return {
-        id: 1,
-        phone: data.phone,
-        nickname: data.nickname,
-        gender: data.gender,
-        created_at: new Date().toISOString()
-      }
-    }
-  },
-  
-  login: async (data) => {
-    try {
-      return await api.post('/api/v1/login', data)
-    } catch (error) {
-      // 临时：如果后端失败，返回模拟登录
-      console.log('登录失败，使用模拟登录', error)
-      const token = 'mock-token-' + Date.now()
-      localStorage.setItem('token', token)
-      return {
-        access_token: token,
-        token_type: 'bearer',
-        user: {
-          id: 1,
-          phone: data.phone,
-          nickname: '模拟用户',
-          gender: 1,
-          created_at: new Date().toISOString()
-        }
-      }
-    }
-  },
-  
+  register: (data) => api.post('/api/auth/register', data),
+  login: (data) => api.post('/api/auth/login', data),
   logout: () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
     return Promise.resolve({ success: true })
   }
 }
 
 export const userAPI = {
-  getProfile: (userId) => api.get(`/api/v1/profile/${userId}`),
-  updateProfile: (userId, data) => api.put(`/api/v1/profile/${userId}`, data)
+  getMe: () => api.get('/api/users/me'),
+  updateMe: (data) => api.put('/api/users/me', data),
+  discover: () => api.get('/api/users/discover')
 }
 
 export const matchAPI = {
-  findMatches: (data) => api.post('/api/v1/find', data),
-  likeUser: (userId, targetId) => api.post(`/api/v1/like/${userId}/${targetId}`)
+  getMatches: () => api.get('/api/matches'),
+  discoverUsers: () => api.get('/api/users/discover'),
+  likeUser: (toUserId) => api.post('/api/matches/like', { to_user_id: toUserId })
+}
+
+export const chatAPI = {
+  getConversations: () => api.get('/api/chat/conversations'),
+  getMessages: (conversationId) => api.get(`/api/chat/messages/${conversationId}`),
+  sendMessage: (conversationId, content) => api.post('/api/chat/messages', {
+    conversation_id: conversationId,
+    content
+  })
 }
