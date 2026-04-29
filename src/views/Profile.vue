@@ -1,6 +1,8 @@
 <template>
-  <div class="min-h-screen px-4 py-8">
-    <div class="max-w-4xl mx-auto animate-fade-in">
+  <div class="min-h-screen px-4 py-8 bg-gray-50">
+    <Navbar />
+    
+    <div class="max-w-4xl mx-auto">
       <!-- 标题栏 -->
       <div class="mb-8">
         <h2 class="text-4xl font-bold gradient-text mb-2">我的资料</h2>
@@ -14,72 +16,60 @@
       </div>
 
       <!-- 资料卡片 -->
-      <div v-else class="card mb-6">
-      <!-- 头像区域 -->
-      <div class="flex items-center mb-8 pb-8 border-b border-gray-200">
-        <div class="relative flex-shrink-0 cursor-pointer group" @click="triggerFileInput">
-          <div
-            v-if="avatarPreview || profile.avatar_url"
-            class="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg"
-          >
-            <img :src="avatarPreview || profile.avatar_url" class="w-full h-full object-cover" alt="avatar" />
+      <div v-else class="bg-white rounded-2xl shadow-lg p-8">
+        
+        <!-- 头像区域 -->
+        <div class="flex items-center mb-8 pb-8 border-b border-gray-200">
+          <div class="relative flex-shrink-0 cursor-pointer group" @click="triggerFileInput">
+            <div v-if="avatarPreview || formData.avatar_url" 
+                 class="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+              <img :src="avatarPreview || formData.avatar_url" class="w-full h-full object-cover" alt="avatar" />
+            </div>
+            <div v-else class="w-20 h-20 rounded-full bg-gradient-to-br from-pink-400 to-red-500 flex items-center justify-center text-white font-bold text-2xl">
+              {{ formData.nickname?.charAt(0).toUpperCase() || '?' }}
+            </div>
+            
+            <div class="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012 2h.93a2 2 0 001.664-.89l.812 1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0118.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2 2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            
+            <input ref="fileInput" type="file" accept="image/*" @change="handleAvatarChange" class="hidden" />
           </div>
-          <div v-else class="avatar avatar-lg flex-shrink-0">
-            {{ profile.nickname?.charAt(0) || '?' }}
+          
+          <div class="ml-6 flex-1">
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ formData.nickname }}</h3>
+            <p class="text-gray-500 text-lg">{{ formData.email }}</p>
           </div>
-          <div class="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+          
+          <button @click="triggerFileInput" class="btn btn-secondary flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012 2h.93a2 2 0 001.664-.89l.812 1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0118.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2 2V9z"></path>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
-          </div>
-          <input
-            ref="fileInput"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            @change="handleAvatarChange"
-          />
+            <span>更换头像</span>
+          </button>
         </div>
-        <div class="ml-6 flex-1">
-          <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ profile.nickname }}</h3>
-          <p class="text-gray-500 text-lg">{{ profile.email }}</p>
-        </div>
-        <button @click="triggerFileInput" class="btn btn-secondary flex items-center space-x-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
-          <span>更换头像</span>
-        </button>
-      </div>
 
         <!-- 基本信息 -->
         <div class="mb-8">
           <h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
             <svg class="w-6 h-6 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 007-7z"></path>
             </svg>
             基本信息
           </h4>
+          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">昵称</label>
-              <input
-                v-model="formData.nickname"
-                type="text"
-                placeholder="请输入昵称"
-                class="input"
-              />
+              <input v-model="formData.nickname" type="text" placeholder="请输入昵称" class="input" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">邮箱</label>
-              <input
-                :value="profile.email"
-                type="email"
-                disabled
-                class="input bg-gray-100 cursor-not-allowed"
-              />
+              <input :value="formData.email" type="email" disabled class="input bg-gray-100 cursor-not-allowed" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">性别</label>
@@ -91,45 +81,32 @@
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">生日</label>
-              <input
-                v-model="formData.birth_date"
-                type="date"
-                class="input"
-              />
+              <input v-model="formData.birth_date" type="date" class="input" />
             </div>
           </div>
         </div>
 
         <!-- 扩展资料 -->
-        <div v-if="profile.profile" class="mb-8">
+        <div v-if="formData.profile" class="mb-8">
           <h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
             <svg class="w-6 h-6 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414-9.414L11.828 15H9v-2.828l8.586-8.586a2 2 0 012.828 0l-7.717-7.717A2 2 0 0112.828 15H19a2 2 0 002-2v-5m-1.414-9.414-9.414z"></path>
             </svg>
             扩展资料
           </h4>
+          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">身高</label>
-              <input
-                v-model="formData.height"
-                type="number"
-                placeholder="请输入身高"
-                class="input"
-              />
+              <input v-model="formData.profile.height" type="number" placeholder="请输入身高" class="input" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">体重</label>
-              <input
-                v-model="formData.weight"
-                type="number"
-                placeholder="请输入体重"
-                class="input"
-              />
+              <input v-model="formData.profile.weight" type="number" placeholder="请输入体重" class="input" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">学历</label>
-              <select v-model="formData.education" class="input">
+              <select v-model="formData.profile.education" class="input">
                 <option value="">请选择学历</option>
                 <option value="1">高中</option>
                 <option value="2">大专</option>
@@ -140,12 +117,7 @@
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">职业</label>
-              <input
-                v-model="formData.occupation"
-                type="text"
-                placeholder="请输入职业"
-                class="input"
-              />
+              <input v-model="formData.profile.occupation" type="text" placeholder="请输入职业" class="input" />
             </div>
           </div>
         </div>
@@ -154,52 +126,40 @@
         <div class="mb-8">
           <h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
             <svg class="w-6 h-6 mr-2 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024-.195 1.414-.586l7-7a2 2 0 01-2.828 0l-7.717-7.717A2 2 0 0112.828 15H19a2 2 0 002-2v-5m-1.414-9.414-9.414z"></path>
             </svg>
             个人简介
           </h4>
+          
           <div class="mb-6">
             <label class="block text-sm font-semibold text-gray-700 mb-2">自我介绍</label>
-            <textarea
-              v-model="formData.bio"
-              class="input"
-              rows="4"
-              placeholder="介绍一下自己..."
-            ></textarea>
+            <textarea v-model="formData.profile.self_intro" class="input" rows="4" placeholder="介绍一下自己..."></textarea>
           </div>
+          
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">兴趣标签</label>
-            <div v-if="profile.profile?.tags?.length" class="flex flex-wrap gap-2 mb-4">
-              <span v-for="tag in profile.profile.tags" :key="tag" class="badge badge-secondary">
+            <div v-if="formData.profile.tags?.length" class="flex flex-wrap gap-2 mb-4">
+              <span v-for="tag in formData.profile.tags" :key="tag" class="badge badge-secondary">
                 {{ tag }}
               </span>
             </div>
-            <input
-              v-model="formData.tags"
-              type="text"
-              placeholder="用逗号分隔，如：旅行,美食,电影"
-              class="input"
-            />
+            <input v-model="formData.tags" type="text" placeholder="用逗号分隔，如：旅行,美食,电影" class="input" />
           </div>
         </div>
 
         <!-- 保存按钮 -->
         <div class="flex space-x-4">
-          <button
-            @click="handleSave"
-            class="btn btn-primary flex-1 flex items-center justify-center space-x-2"
-            :disabled="saving"
-          >
+          <button @click="handleSave" class="btn btn-primary flex-1 flex items-center justify-center space-x-2" :disabled="saving">
             <svg v-if="!saving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
+            <svg v-else class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8 0V4a8 8 0 01-16 0z"></path>
+            </svg>
             <span>{{ saving ? '保存中...' : '保存修改' }}</span>
           </button>
-          <button
-            @click="loadProfile"
-            class="btn btn-secondary"
-            :disabled="saving"
-          >
+          <button @click="loadProfile" class="btn btn-secondary" :disabled="saving">
             重置
           </button>
         </div>
@@ -210,21 +170,29 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import Navbar from '@/components/Navbar.vue'
 import { userAPI } from '@/api'
+
+const router = useRouter()
 
 const profile = ref({})
 const fileInput = ref(null)
 const avatarPreview = ref('')
 const formData = ref({
   nickname: '',
+  email: '',
   gender: '',
   birth_date: '',
   avatar_url: '',
-  height: '',
-  weight: '',
-  education: '',
-  occupation: '',
-  bio: '',
+  profile: {
+    height: '',
+    weight: '',
+    education: '',
+    occupation: '',
+    self_intro: '',
+    tags: []
+  },
   tags: ''
 })
 
@@ -277,6 +245,7 @@ const handleAvatarChange = async (e) => {
     alert('图片不能超过5MB')
     return
   }
+
   try {
     const base64 = await compressImage(file)
     avatarPreview.value = base64
@@ -296,14 +265,18 @@ const loadProfile = async () => {
 
     formData.value = {
       nickname: response.nickname || '',
+      email: response.email || '',
       gender: response.gender || '',
       birth_date: response.birthday || '',
       avatar_url: response.avatar_url || '',
-      height: response.profile?.height || '',
-      weight: response.profile?.weight || '',
-      education: response.profile?.education || '',
-      occupation: response.profile?.occupation || '',
-      bio: response.profile?.self_intro || '',
+      profile: {
+        height: response.profile?.height || '',
+        weight: response.profile?.weight || '',
+        education: response.profile?.education || '',
+        occupation: response.profile?.occupation || '',
+        self_intro: response.profile?.self_intro || '',
+        tags: response.profile?.tags || []
+      },
       tags: response.profile?.tags?.join(',') || ''
     }
   } catch (err) {
@@ -318,7 +291,7 @@ const handleSave = async () => {
   try {
     const payload = { ...formData.value }
     if (payload.tags) {
-      payload.tags = payload.tags.split(',').map(t => t.trim()).filter(Boolean)
+      payload.profile.tags = payload.tags.split(',').map(t => t.trim()).filter(Boolean)
     }
     await userAPI.updateMe(payload)
     alert('保存成功！')
