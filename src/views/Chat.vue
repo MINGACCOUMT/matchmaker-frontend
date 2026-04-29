@@ -53,37 +53,57 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { chatAPI } from '@/api'
 
 const route = useRoute()
 const userId = Number(route.params.userId)
 
-const messages = ref([
-  { id: 1, senderId: 2, text: '你好！很高兴认识你' },
-  { id: 2, senderId: 1, text: '你好！我也是' }
-])
-
+const messages = ref([])
 const newMessage = ref('')
 const loading = ref(false)
+const conversationId = ref(null)
 
-const handleSend = () => {
-  if (!newMessage.value.trim()) return
+onMounted(async () => {
+  try {
+    // 1. 获取会话列表，找到与该用户的会话
+    const convs = await chatAPI.getConversations()
+    const conv = convs.conversations?.find(c => c.other_user?.id === userId)
+    if (conv) {
+      conversationId.value = conv.id
+      // 2. 加载历史消息
+      const msgs = await chatAPI.getMessages(conv.id)
+      messages.value = (msgs.messages || []).map(m => ({
+        id: m.id,
+        senderId: m.sender_id,
+        text: m.content
+      }))
+    }
+  } catch (err) {
+    console.error('加载聊天失败:', err)
+  }
+})
 
+const handleSend = async () => {
+  if (!newMessage.value.trim() || !conversationId.value) return
+
+  const content = newMessage.value.trim()
+  loading.value = true
+
+  // 先添加到本地
+  const tempId = Date.now()
   messages.value.push({
-    id: messages.value.length + 1,
-    senderId: 1,
-    text: newMessage.value
+    id: tempId,
+    senderId: 1, // 当前用户
+    text: content
   })
-
   newMessage.value = ''
 
-  // TODO: 实现 WebSocket 实时聊天
-  console.log('发送消息:', newMessage.value)
+  try {
+    await chatAPI.sendMessage(conversationId.value, content)
+  } catch (err) {
+    console.error('发送失败:', err)
+  } finally {
+    loading.value = false
+  }
 }
-
-onMounted(() => {
-  console.log('聊天用户 ID:', userId)
-  
-  // TODO: 加载历史消息
-  // loadMessages(userId)
-})
 </script>

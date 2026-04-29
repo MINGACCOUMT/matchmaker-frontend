@@ -107,9 +107,13 @@ const success = ref(false)
 
 onMounted(async () => {
   try {
-    // TODO: 加载用户资料
-    // const response = await userAPI.getProfile(userId)
-    // formData.value = response
+    const response = await userAPI.getMe()
+    if (response) {
+      formData.value.nickname = response.nickname || ''
+      formData.value.gender = response.gender || 1
+      formData.value.birthday = response.birthday || ''
+      formData.value.bio = response.profile?.self_intro || ''
+    }
   } catch (err) {
     console.error('加载资料失败:', err)
   }
@@ -120,15 +124,14 @@ const handleUpdate = async () => {
   success.value = false
 
   try {
-    // TODO: 更新用户资料
-    // await userAPI.updateProfile(userId, formData.value)
-    
-    console.log('更新成功:', formData.value)
+    await userAPI.updateMe({
+      nickname: formData.value.nickname,
+      gender: formData.value.gender,
+      birthday: formData.value.birthday,
+      bio: formData.value.bio
+    })
     success.value = true
-    
-    setTimeout(() => {
-      success.value = false
-    }, 3000)
+    setTimeout(() => { success.value = false }, 3000)
   } catch (err) {
     console.error('更新失败:', err)
   } finally {

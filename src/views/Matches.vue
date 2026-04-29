@@ -19,18 +19,21 @@
         >
           <div class="flex items-center mb-4">
             <div class="w-20 h-20 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              {{ match.nickname.charAt(0) }}
+              {{ match.nickname?.charAt(0) || '?' }}
             </div>
             <div class="ml-4">
               <h3 class="text-xl font-bold text-gray-900">{{ match.nickname }}</h3>
-              <p class="text-sm text-gray-600">匹配度: {{ match.score }}%</p>
+              <p class="text-sm text-gray-600">{{ match.gender === 1 ? '男' : '女' }} · {{ match.age }}岁</p>
             </div>
           </div>
 
           <div class="space-y-2 mb-4">
-            <p v-if="match.age" class="text-sm text-gray-600">年龄: {{ match.age }}岁</p>
-            <p v-if="match.city" class="text-sm text-gray-600">城市: {{ match.city }}</p>
-            <p v-if="match.occupation" class="text-sm text-gray-600">职业: {{ match.occupation }}</p>
+            <p v-if="match.bio" class="text-sm text-gray-600 line-clamp-2">{{ match.bio }}</p>
+            <div v-if="match.tags?.length" class="flex flex-wrap gap-1">
+              <span v-for="tag in match.tags" :key="tag" class="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
+                {{ tag }}
+              </span>
+            </div>
           </div>
 
           <div class="flex space-x-2">
@@ -73,23 +76,18 @@ const loadMatches = async () => {
   loading.value = true
 
   try {
-    const response = await matchAPI.findMatches({
-      user_id: userStore.user?.id || 1,
-      limit: 10
-    })
-    
-    matches.value = response.matched_users.map(user => ({
+    const response = await matchAPI.discoverUsers()
+    matches.value = (response.users || []).map(user => ({
       id: user.id,
       nickname: user.nickname,
-      score: Math.round(user.score),
-      age: 25,
-      city: '上海',
-      occupation: '软件工程师'
+      avatar_url: user.avatar_url,
+      gender: user.gender,
+      age: user.age,
+      bio: user.bio,
+      tags: user.tags || []
     }))
-    
-    console.log('匹配列表:', matches.value)
   } catch (err) {
-    console.error('加载匹配失败:', err)
+    console.error('加载推荐失败:', err)
     matches.value = []
   } finally {
     loading.value = false
@@ -98,9 +96,8 @@ const loadMatches = async () => {
 
 const handleLike = async (targetId) => {
   try {
-    await matchAPI.likeUser(userStore.user?.id || 1, targetId)
+    await matchAPI.likeUser(targetId)
     console.log('喜欢成功:', targetId)
-    
     // 移除已喜欢的用户
     matches.value = matches.value.filter(m => m.id !== targetId)
   } catch (err) {

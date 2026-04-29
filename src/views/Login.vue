@@ -8,11 +8,11 @@
 
       <form @submit.prevent="handleLogin" class="space-y-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">手机号</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
           <input
-            v-model="formData.phone"
-            type="tel"
-            placeholder="请输入手机号"
+            v-model="formData.email"
+            type="email"
+            placeholder="请输入邮箱"
             class="input"
             required
           />
@@ -56,7 +56,7 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const formData = ref({
-  phone: '',
+  email: '',
   password: ''
 })
 
@@ -68,20 +68,19 @@ const handleLogin = async () => {
   error.value = ''
 
   try {
-    // TODO: 实现登录 API
-    // const response = await authAPI.login(formData.value)
-    // userStore.setToken(response.token)
-    // userStore.setUser(response.user)
-    
-    // 临时模拟登录
-    console.log('登录成功（临时模拟）')
-    userStore.setToken('mock-token')
-    userStore.setUser({ id: 1, phone: formData.value.phone })
-    
+    const response = await authAPI.login(formData.value)
+    console.log('登录成功:', response)
+
+    // 保存 token 和用户信息
+    if (response.access_token) {
+      userStore.setToken(response.access_token)
+      userStore.setUser(response.user)
+    }
+
     router.push('/matches')
   } catch (err) {
     console.error('登录失败:', err)
-    error.value = err.response?.data?.detail || '登录失败，请重试'
+    error.value = err.response?.data?.detail || err.message || '登录失败，请重试'
   } finally {
     loading.value = false
   }

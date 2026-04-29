@@ -8,13 +8,25 @@
 
       <form @submit.prevent="handleRegister" class="space-y-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">手机号</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
           <input
-            v-model="formData.phone"
-            type="tel"
-            placeholder="请输入手机号"
+            v-model="formData.email"
+            type="email"
+            placeholder="请输入邮箱"
             class="input"
             required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+          <input
+            v-model="formData.password"
+            type="password"
+            placeholder="请输入密码（至少6位）"
+            class="input"
+            required
+            minlength="6"
           />
         </div>
 
@@ -41,10 +53,29 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">生日</label>
           <input
-            v-model="formData.birthday"
+            v-model="formData.birth_date"
             type="date"
             class="input"
-            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">个人简介</label>
+          <textarea
+            v-model="formData.bio"
+            class="input"
+            rows="3"
+            placeholder="介绍一下自己..."
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">标签（用逗号分隔）</label>
+          <input
+            v-model="formData.tags"
+            type="text"
+            placeholder="例如：旅行,美食,电影"
+            class="input"
           />
         </div>
 
@@ -75,10 +106,13 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const formData = ref({
-  phone: '',
+  email: '',
+  password: '',
   nickname: '',
   gender: '',
-  birthday: ''
+  birth_date: '',
+  bio: '',
+  tags: ''
 })
 
 const loading = ref(false)
@@ -91,12 +125,18 @@ const handleRegister = async () => {
   try {
     const response = await authAPI.register(formData.value)
     console.log('注册成功:', response)
-    
-    // 注册成功后跳转到登录页
-    router.push('/login')
+
+    // 保存 token 和用户信息
+    if (response.access_token) {
+      userStore.setToken(response.access_token)
+      userStore.setUser(response.user)
+    }
+
+    // 跳转到匹配页
+    router.push('/matches')
   } catch (err) {
     console.error('注册失败:', err)
-    error.value = err.response?.data?.detail || '注册失败，请重试'
+    error.value = err.response?.data?.detail || err.message || '注册失败，请重试'
   } finally {
     loading.value = false
   }
