@@ -15,23 +15,44 @@
 
       <!-- 资料卡片 -->
       <div v-else class="card mb-6">
-        <!-- 头像区域 -->
-        <div class="flex items-center mb-8 pb-8 border-b border-gray-200">
-          <div class="avatar avatar-lg flex-shrink-0">
+      <!-- 头像区域 -->
+      <div class="flex items-center mb-8 pb-8 border-b border-gray-200">
+        <div class="relative flex-shrink-0 cursor-pointer group" @click="triggerFileInput">
+          <div
+            v-if="avatarPreview || profile.avatar_url"
+            class="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg"
+          >
+            <img :src="avatarPreview || profile.avatar_url" class="w-full h-full object-cover" alt="avatar" />
+          </div>
+          <div v-else class="avatar avatar-lg flex-shrink-0">
             {{ profile.nickname?.charAt(0) || '?' }}
           </div>
-          <div class="ml-6 flex-1">
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ profile.nickname }}</h3>
-            <p class="text-gray-500 text-lg">{{ profile.email }}</p>
-          </div>
-          <button class="btn btn-secondary flex items-center space-x-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
-            <span>更换头像</span>
-          </button>
+          </div>
+          <input
+            ref="fileInput"
+            type="file"
+            accept="image/*"
+            class="hidden"
+            @change="handleAvatarChange"
+          />
         </div>
+        <div class="ml-6 flex-1">
+          <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ profile.nickname }}</h3>
+          <p class="text-gray-500 text-lg">{{ profile.email }}</p>
+        </div>
+        <button @click="triggerFileInput" class="btn btn-secondary flex items-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span>更换头像</span>
+        </button>
+      </div>
 
         <!-- 基本信息 -->
         <div class="mb-8">
@@ -192,10 +213,13 @@ import { ref, onMounted } from 'vue'
 import { userAPI } from '@/api'
 
 const profile = ref({})
+const fileInput = ref(null)
+const avatarPreview = ref('')
 const formData = ref({
   nickname: '',
   gender: '',
   birth_date: '',
+  avatar_url: '',
   height: '',
   weight: '',
   education: '',
@@ -211,16 +235,70 @@ onMounted(async () => {
   await loadProfile()
 })
 
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const compressImage = (file, maxWidth = 300, maxHeight = 300, quality = 0.8) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        let { width, height } = img
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height)
+          width *= ratio
+          height *= ratio
+        }
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, width, height)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.onerror = reject
+      img.src = e.target.result
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+const handleAvatarChange = async (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  if (!file.type.startsWith('image/')) {
+    alert('请选择图片文件')
+    return
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    alert('图片不能超过5MB')
+    return
+  }
+  try {
+    const base64 = await compressImage(file)
+    avatarPreview.value = base64
+    formData.value.avatar_url = base64
+  } catch (err) {
+    console.error('图片处理失败:', err)
+    alert('图片处理失败')
+  }
+}
+
 const loadProfile = async () => {
   loading.value = true
   try {
     const response = await userAPI.getMe()
     profile.value = response
+    avatarPreview.value = ''
 
     formData.value = {
       nickname: response.nickname || '',
       gender: response.gender || '',
       birth_date: response.birthday || '',
+      avatar_url: response.avatar_url || '',
       height: response.profile?.height || '',
       weight: response.profile?.weight || '',
       education: response.profile?.education || '',
@@ -238,7 +316,11 @@ const loadProfile = async () => {
 const handleSave = async () => {
   saving.value = true
   try {
-    await userAPI.updateMe(formData.value)
+    const payload = { ...formData.value }
+    if (payload.tags) {
+      payload.tags = payload.tags.split(',').map(t => t.trim()).filter(Boolean)
+    }
+    await userAPI.updateMe(payload)
     alert('保存成功！')
     await loadProfile()
   } catch (err) {

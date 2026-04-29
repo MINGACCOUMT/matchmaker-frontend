@@ -55,302 +55,136 @@
     <!-- 主内容 -->
     <main class="flex-1 px-4 sm:px-6 lg:px-8 pb-8 relative z-10">
       <div class="max-w-7xl mx-auto">
-        <!-- 三栏布局 -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- 左栏 — 推荐用户 (3列) -->
+          <!-- 左栏 — 推荐用户 -->
           <div class="lg:col-span-3">
             <div class="card">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-gray-800">推荐给你</h3>
-                <select class="text-xs bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 text-gray-500 outline-none">
-                  <option>全部</option>
-                  <option>同城</option>
-                  <option>最新</option>
-                </select>
               </div>
-
-              <div class="space-y-4">
+              <div v-if="loading" class="text-center text-gray-400 py-8">加载中...</div>
+              <div v-else class="space-y-4">
                 <div
-                  v-for="user in recommendedUsers"
+                  v-for="user in recommendedUsers.slice(0, 5)"
                   :key="user.id"
-                  class="flex items-center gap-3 p-3 rounded-2xl hover:bg-pink-50/50 transition-colors group"
+                  class="flex items-center gap-3 p-3 rounded-2xl hover:bg-pink-50/50 transition-colors"
                 >
                   <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                    {{ user.nickname.charAt(0) }}
+                    {{ user.nickname?.charAt(0) || '?' }}
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1">
                       <span class="font-semibold text-sm text-gray-800 truncate">{{ user.nickname }}</span>
                       <span class="text-xs text-gray-400">{{ user.age }}岁</span>
                     </div>
-                    <div class="text-xs text-gray-400 mb-1">{{ user.city }}</div>
-                    <div class="progress-bar w-full">
-                      <div class="progress-bar-fill" :style="{ width: user.matchScore + '%' }"></div>
-                    </div>
-                  </div>
-                  <div class="flex flex-col gap-1">
-                    <button class="w-7 h-7 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center hover:bg-pink-500 hover:text-white transition-colors text-xs">
-                      💕
-                    </button>
-                    <button class="w-7 h-7 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-gray-300 transition-colors text-xs">
-                      ✕
-                    </button>
+                    <div class="text-xs text-gray-400">{{ user.gender === 1 ? '男' : '女' }}</div>
                   </div>
                 </div>
               </div>
-
-              <RouterLink to="/matches" class="flex items-center justify-center gap-1 mt-4 text-sm text-pink-400 hover:text-pink-500 font-medium">
-                查看全部推荐
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </RouterLink>
             </div>
           </div>
 
-          <!-- 中栏 — 匹配概览 (6列) -->
+          <!-- 中栏 — 滑动卡片 -->
           <div class="lg:col-span-6">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-bold text-gray-800">匹配概览</h3>
-              <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-100">
-                <button
-                  v-for="view in views"
-                  :key="view.key"
-                  @click="activeView = view.key"
-                  :class="[
-                    'px-4 py-1.5 rounded-full text-xs font-medium transition-all',
-                    activeView === view.key ? 'bg-gradient-to-r from-pink-300 to-pink-400 text-white shadow-sm' : 'text-gray-500 hover:text-pink-400'
-                  ]"
-                >
-                  {{ view.label }}
-                </button>
-              </div>
+              <h3 class="text-lg font-bold text-gray-800">发现</h3>
+              <span class="text-xs text-gray-400">剩余 {{ users.length }} 人</span>
             </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div
-                v-for="match in matchOverview"
-                :key="match.id"
-                class="card card-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-              >
-                <div class="flex items-center gap-3 mb-4">
-                  <div class="w-16 h-16 rounded-full bg-gradient-to-br from-pink-300 via-pink-400 to-purple-400 flex items-center justify-center text-white text-xl font-bold shadow-md ring-4 ring-white">
-                    {{ match.nickname.charAt(0) }}
-                  </div>
-                  <div>
-                    <h4 class="font-bold text-gray-800">{{ match.nickname }}</h4>
-                    <p class="text-xs text-gray-500">{{ match.gender === 1 ? '男' : '女' }} · {{ match.age }}岁 · {{ match.city }}</p>
-                  </div>
-                </div>
-
-                <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ match.bio }}</p>
-
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span v-for="tag in match.tags.slice(0, 3)" :key="tag" class="tag tag-pink text-xs">
-                    {{ tag }}
-                  </span>
-                </div>
-
-                <!-- 匹配度环形进度 -->
-                <div class="flex items-center justify-between mb-4">
-                  <div class="flex items-center gap-2">
-                    <div class="relative w-12 h-12">
-                      <svg class="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
-                        <path class="text-gray-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
-                        <path class="text-pink-400" :stroke-dasharray="match.matchScore + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                      </svg>
-                      <span class="absolute inset-0 flex items-center justify-center text-xs font-bold text-pink-500">{{ match.matchScore }}%</span>
-                    </div>
-                    <span class="text-xs text-gray-500">匹配度</span>
-                  </div>
-                </div>
-
-                <div class="flex gap-2">
-                  <RouterLink :to="`/profile?id=${match.id}`" class="btn btn-secondary flex-1 py-2 text-xs text-center">
-                    查看详情
-                  </RouterLink>
-                  <RouterLink :to="`/chat/${match.id}`" class="btn btn-primary flex-1 py-2 text-xs text-center">
-                    开始聊天
-                  </RouterLink>
-                </div>
-              </div>
-            </div>
+            <SwipeCard
+              :users="users"
+              @like="handleLike"
+              @dislike="handleDislike"
+            />
           </div>
 
-          <!-- 右栏 — 数据统计 (3列) -->
+          <!-- 右栏 — 统计 -->
           <div class="lg:col-span-3 space-y-6">
-            <!-- 统计数字卡片 -->
             <div class="grid grid-cols-2 gap-3">
               <div class="card-sm text-center">
-                <div class="text-2xl font-bold text-gradient">128</div>
+                <div class="text-2xl font-bold text-gradient">{{ stats.total }}</div>
                 <div class="text-xs text-gray-500 mt-1">总推荐</div>
               </div>
               <div class="card-sm text-center">
-                <div class="text-2xl font-bold text-gradient">24</div>
+                <div class="text-2xl font-bold text-gradient">{{ stats.matched }}</div>
                 <div class="text-xs text-gray-500 mt-1">已匹配</div>
               </div>
               <div class="card-sm text-center">
-                <div class="text-2xl font-bold text-gradient">8</div>
-                <div class="text-xs text-gray-500 mt-1">待处理</div>
+                <div class="text-2xl font-bold text-gradient">{{ stats.liked }}</div>
+                <div class="text-xs text-gray-500 mt-1">喜欢</div>
               </div>
               <div class="card-sm text-center">
-                <div class="text-2xl font-bold text-gradient">15</div>
-                <div class="text-xs text-gray-500 mt-1">新消息</div>
-              </div>
-            </div>
-
-            <!-- 匹配趋势折线图 -->
-            <div class="card">
-              <h4 class="text-sm font-bold text-gray-800 mb-4">匹配趋势</h4>
-              <div class="h-32 relative">
-                <svg class="w-full h-full" viewBox="0 0 200 100" preserveAspectRatio="none">
-                  <!-- 网格线 -->
-                  <line x1="0" y1="25" x2="200" y2="25" stroke="#F3F4F6" stroke-width="1" />
-                  <line x1="0" y1="50" x2="200" y2="50" stroke="#F3F4F6" stroke-width="1" />
-                  <line x1="0" y1="75" x2="200" y2="75" stroke="#F3F4F6" stroke-width="1" />
-                  <!-- 折线 -->
-                  <polyline
-                    points="0,70 40,55 80,60 120,35 160,25 200,20"
-                    fill="none"
-                    stroke="url(#lineGradient)"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <!-- 填充区域 -->
-                  <polygon
-                    points="0,70 40,55 80,60 120,35 160,25 200,20 200,100 0,100"
-                    fill="url(#areaGradient)"
-                    opacity="0.3"
-                  />
-                  <!-- 数据点 -->
-                  <circle cx="0" cy="70" r="3" fill="#FF8FAB" />
-                  <circle cx="40" cy="55" r="3" fill="#FF8FAB" />
-                  <circle cx="80" cy="60" r="3" fill="#FF8FAB" />
-                  <circle cx="120" cy="35" r="3" fill="#FF8FAB" />
-                  <circle cx="160" cy="25" r="3" fill="#FF8FAB" />
-                  <circle cx="200" cy="20" r="3" fill="#FF8FAB" />
-                  <defs>
-                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#FFB6C1" />
-                      <stop offset="100%" stop-color="#FF69B4" />
-                    </linearGradient>
-                    <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stop-color="#FF8FAB" stop-opacity="0.5" />
-                      <stop offset="100%" stop-color="#FF8FAB" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="flex justify-between text-xs text-gray-400 mt-2">
-                <span>周一</span>
-                <span>周三</span>
-                <span>周五</span>
-                <span>周日</span>
-              </div>
-            </div>
-
-            <!-- 用户分布环形图 -->
-            <div class="card">
-              <h4 class="text-sm font-bold text-gray-800 mb-4">用户分布</h4>
-              <div class="flex items-center justify-center">
-                <div class="relative w-32 h-32">
-                  <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
-                    <path class="text-pink-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
-                    <path class="text-pink-400" stroke-dasharray="55, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
-                    <path class="text-purple-300" stroke-dasharray="30, 100" stroke-dashoffset="-55" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
-                  </svg>
-                  <div class="absolute inset-0 flex items-center justify-center flex-col">
-                    <span class="text-lg font-bold text-gray-800">1.2k</span>
-                    <span class="text-xs text-gray-400">用户</span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex justify-center gap-4 mt-4">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2.5 h-2.5 rounded-full bg-pink-400"></span>
-                  <span class="text-xs text-gray-500">女性 55%</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2.5 h-2.5 rounded-full bg-purple-300"></span>
-                  <span class="text-xs text-gray-500">男性 30%</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2.5 h-2.5 rounded-full bg-pink-200"></span>
-                  <span class="text-xs text-gray-500">其他 15%</span>
-                </div>
+                <div class="text-2xl font-bold text-gradient">{{ stats.messages }}</div>
+                <div class="text-xs text-gray-500 mt-1">消息</div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </main>
+
+    <!-- 匹配成功弹窗 -->
+    <MatchModal
+      :show="showMatchModal"
+      :me="userStore.user"
+      :match-user="matchedUser"
+      @close="showMatchModal = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { matchAPI } from '@/api'
+import SwipeCard from '@/components/SwipeCard.vue'
+import MatchModal from '@/components/MatchModal.vue'
 
 const userStore = useUserStore()
 
-const views = [
-  { key: 'card', label: '卡片视图' },
-  { key: 'list', label: '列表视图' }
-]
-const activeView = ref('card')
+const users = ref([])
+const recommendedUsers = ref([])
+const loading = ref(false)
+const showMatchModal = ref(false)
+const matchedUser = ref(null)
+const stats = ref({ total: 0, matched: 0, liked: 0, messages: 0 })
 
-const recommendedUsers = ref([
-  { id: 1, nickname: '小雨', age: 24, city: '北京', matchScore: 92 },
-  { id: 2, nickname: '橙子', age: 26, city: '上海', matchScore: 88 },
-  { id: 3, nickname: '米粒', age: 23, city: '广州', matchScore: 85 },
-  { id: 4, nickname: '晴天', age: 25, city: '深圳', matchScore: 80 },
-  { id: 5, nickname: '星星', age: 27, city: '成都', matchScore: 78 }
-])
-
-const matchOverview = ref([
-  {
-    id: 101,
-    nickname: '小鹿',
-    gender: 2,
-    age: 24,
-    city: '杭州',
-    bio: '喜欢旅行和摄影，希望能找到志同道合的伴侣一起探索世界的美好。',
-    tags: ['旅行', '摄影', '美食'],
-    matchScore: 96
-  },
-  {
-    id: 102,
-    nickname: '阿杰',
-    gender: 1,
-    age: 28,
-    city: '北京',
-    bio: '程序员一枚，热爱生活，喜欢健身和阅读。',
-    tags: ['健身', '阅读', '编程'],
-    matchScore: 89
-  },
-  {
-    id: 103,
-    nickname: '婉儿',
-    gender: 2,
-    age: 25,
-    city: '上海',
-    bio: '音乐老师，喜欢弹吉他和唱歌，希望找到懂音乐的你。',
-    tags: ['音乐', '吉他', '唱歌'],
-    matchScore: 85
-  },
-  {
-    id: 104,
-    nickname: '大明',
-    gender: 1,
-    age: 27,
-    city: '深圳',
-    bio: '创业中，喜欢户外运动，周末经常爬山或骑行。',
-    tags: ['户外', '骑行', '创业'],
-    matchScore: 82
+const loadUsers = async () => {
+  loading.value = true
+  try {
+    const res = await matchAPI.discoverUsers()
+    users.value = res.users || []
+    recommendedUsers.value = res.users || []
+    stats.value.total = users.value.length
+  } catch (err) {
+    console.error('加载失败:', err)
+  } finally {
+    loading.value = false
   }
-])
+}
+
+const handleLike = async (user) => {
+  users.value.shift()
+  stats.value.liked++
+  try {
+    const res = await matchAPI.likeUser(user.id)
+    if (res.matched) {
+      matchedUser.value = user
+      showMatchModal.value = true
+      stats.value.matched++
+    }
+  } catch (err) {
+    console.error('like 失败:', err)
+  }
+}
+
+const handleDislike = (user) => {
+  users.value.shift()
+}
+
+onMounted(() => {
+  loadUsers()
+})
 </script>
 
 <style scoped>
