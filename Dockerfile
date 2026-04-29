@@ -1,17 +1,29 @@
-# 前端 Dockerfile（用于开发）
-FROM node:22-alpine
+# 前端 Dockerfile（生产部署）
+FROM node:22-alpine as builder
 
 WORKDIR /app
 
 # 安装依赖
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # 复制代码
 COPY . .
 
-# 暴露端口
-EXPOSE 3000
+# 构建生产版本
+RUN npm run build
 
-# 启动开发服务器
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# 生产环境
+FROM nginx:alpine
+
+# 复制构建结果
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# 复制 nginx 配置
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# 暴露端口
+EXPOSE 80
+
+# 启动 nginx
+CMD ["nginx", "-g", "daemon off;"]
