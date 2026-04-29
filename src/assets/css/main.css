@@ -134,6 +134,50 @@ body {
   .tag-pink   { background: #FFE4EC; color: #BE185D; }
   .tag-purple { background: #F3E8FF; color: #7C3AED; }
   .tag-green  { background: #DCFCE7; color: #15803D; }
+
+  .toggle {
+    appearance: none;
+    width: 48px;
+    height: 28px;
+    background: #E5E7EB;
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    outline: none;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+  }
+  .toggle:checked {
+    background: linear-gradient(90deg, #FF8FAB, #FF69B4);
+  }
+  .toggle:checked::after {
+    transform: translateX(20px);
+  }
+
+  .progress-bar {
+    height: 8px;
+    background: #F3F4F6;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFB6C1, #FF69B4);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
 }
 
 @layer utilities {
