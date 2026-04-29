@@ -25,6 +25,12 @@ const routes = [
     component: Login
   },
   {
+    path: '/welcome',
+    name: 'Welcome',
+    component: Welcome,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/profile',
     name: 'Profile',
     component: Profile,
@@ -37,7 +43,7 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/chat/:userId',
+    path: '/chat/:userId?',
     name: 'Chat',
     component: Chat,
     meta: { requiresAuth: true }
@@ -46,12 +52,6 @@ const routes = [
     path: '/settings',
     name: 'Settings',
     component: Settings,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/welcome',
-    name: 'Welcome',
-    component: Welcome,
     meta: { requiresAuth: true }
   }
 ]
@@ -64,7 +64,7 @@ const router = createRouter({
 // 导航守卫
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  
+
   if (to.meta.requiresAuth && !token) {
     next('/login')
   } else {
