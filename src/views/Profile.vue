@@ -1,9 +1,18 @@
 <template>
-  <div class="min-h-screen px-4 py-8">
-    <div class="max-w-4xl mx-auto">
+  <div class="min-h-screen px-4 py-8 relative overflow-hidden">
+    <!-- 背景装饰 -->
+    <div class="absolute top-[-10%] right-[-5%] w-72 h-72 bg-pink-200/30 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] left-[-5%] w-72 h-72 bg-purple-200/30 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto relative z-10">
       <div class="card">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">个人资料</h2>
-        
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 bg-gradient-to-br from-pink-300 to-pink-400 rounded-2xl flex items-center justify-center text-white text-xl shadow-md">
+            🌸
+          </div>
+          <h2 class="text-3xl font-bold text-gradient">个人资料</h2>
+        </div>
+
         <form @submit.prevent="handleUpdate" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -19,8 +28,8 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">性别</label>
               <select v-model="formData.gender" class="input" required>
-                <option value="1">男</option>
-                <option value="2">女</option>
+                <option value="1">男 ♂️</option>
+                <option value="2">女 ♀️</option>
               </select>
             </div>
 
@@ -75,12 +84,14 @@
             ></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary" :disabled="loading">
-            {{ loading ? '保存中...' : '保存' }}
-          </button>
+          <div class="flex items-center gap-4">
+            <button type="submit" class="btn btn-primary px-8" :disabled="loading">
+              {{ loading ? '保存中...' : '保存 ✨' }}
+            </button>
 
-          <div v-if="success" class="text-green-500">
-            保存成功！
+            <div v-if="success" class="text-pink-500 flex items-center gap-1 bg-pink-50 px-4 py-2 rounded-full text-sm">
+              <span>💖</span> 保存成功！
+            </div>
           </div>
         </form>
       </div>
