@@ -5,6 +5,8 @@ import Login from '@/views/Login.vue'
 import Profile from '@/views/Profile.vue'
 import Matches from '@/views/Matches.vue'
 import Chat from '@/views/Chat.vue'
+import Settings from '@/views/Settings.vue'
+import Welcome from '@/views/Welcome.vue'
 
 const routes = [
   {
@@ -38,6 +40,18 @@ const routes = [
     path: '/chat/:userId',
     name: 'Chat',
     component: Chat,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/welcome',
+    name: 'Welcome',
+    component: Welcome,
     meta: { requiresAuth: true }
   }
 ]
