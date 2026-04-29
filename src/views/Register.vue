@@ -203,7 +203,17 @@ const handleRegister = async () => {
   error.value = ''
 
   try {
-    const response = await authAPI.register(formData.value)
+    // 数据格式转换：gender 转整数，tags 转 JSON 字符串
+    const payload = {
+      ...formData.value,
+      gender: parseInt(formData.value.gender) || 0,
+      birth_date: formData.value.birth_date || null,
+      tags: formData.value.tags
+        ? JSON.stringify(formData.value.tags.split(',').map(t => t.trim()).filter(Boolean))
+        : '[]'
+    }
+
+    const response = await authAPI.register(payload)
     console.log('注册成功:', response)
 
     // 保存 token 和用户信息
@@ -212,8 +222,8 @@ const handleRegister = async () => {
       userStore.setUser(response.user)
     }
 
-    // 跳转到匹配页
-    router.push('/matches')
+    // 跳转到欢迎页
+    router.push('/welcome')
   } catch (err) {
     console.error('注册失败:', err)
     error.value = err.response?.data?.detail || err.message || '注册失败，请重试'
