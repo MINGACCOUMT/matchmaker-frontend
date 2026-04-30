@@ -155,29 +155,25 @@
           <div class="mt-6 flex items-center justify-center gap-6">
             <button
               type="button"
-              class="w-12 h-12 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-green-500 hover:shadow-md hover:scale-105 transition-all"
-              @click="socialLogin('微信')"
-            >
-              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 0 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89c-.135-.01-.27-.027-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.969-.982z"/>
-              </svg>
-            </button>
-            <button
-              type="button"
-              class="w-12 h-12 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-blue-500 hover:shadow-md hover:scale-105 transition-all"
-              @click="socialLogin('QQ')"
-            >
-              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 5.58 2 10c0 2.03.88 3.87 2.3 5.23-.1.55-.5 2.04-.58 2.37-.09.35.12.52.36.36.24-.16 2.45-1.65 2.87-1.95.83.23 1.72.36 2.64.36.28 0 .55-.02.82-.04-.7-2.08.1-4.1 1.6-5.38 1.4-1.16 3.2-1.62 4.83-1.5C16.8 5.5 14.6 2 12 2zm-2 4c.83 0 1.5.67 1.5 1.5S10.83 9 10 9s-1.5-.67-1.5-1.5S9.17 6 10 6zm4 0c.83 0 1.5.67 1.5 1.5S14.83 9 14 9s-1.5-.67-1.5-1.5S13.17 6 14 6zm-2 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-              </svg>
-            </button>
-            <button
-              type="button"
               class="w-12 h-12 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-gray-900 hover:shadow-md hover:scale-105 transition-all"
-              @click="socialLogin('抖音')"
+              @click="handleOAuthLogin('github')"
+              title="GitHub 登录"
             >
               <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.88-2.89 2.89 2.89 0 0 1 2.88-2.89c.3 0 .59.05.86.13V9.1a6.37 6.37 0 0 0-.86-.06A6.34 6.34 0 0 0 2.75 15.38 6.34 6.34 0 0 0 9.09 21.72a6.34 6.34 0 0 0 6.34-6.34V9.91a8.13 8.13 0 0 0 4.78 1.54V7.91a4.78 4.78 0 0 1-.62-.22z"/>
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="w-12 h-12 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-red-500 hover:shadow-md hover:scale-105 transition-all"
+              @click="handleOAuthLogin('google')"
+              title="Google 登录"
+            >
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
             </button>
           </div>
@@ -190,7 +186,7 @@
 <script setup>
 import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { authAPI } from '@/api'
+import { authAPI, oauthAPI } from '@/api'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
@@ -240,9 +236,17 @@ const handleForgotPassword = () => {
   alert('找回密码功能正在开发中，敬请期待')
 }
 
-const socialLogin = (platform) => {
-  console.log(`${platform}登录暂未支持`)
-  alert(`${platform}登录暂未支持`)
+const handleOAuthLogin = async (provider) => {
+  try {
+    const response = await oauthAPI.getAuthorizeUrl(provider)
+    if (response.authorization_url) {
+      localStorage.setItem('oauth_provider', provider)
+      window.location.href = response.authorization_url
+    }
+  } catch (err) {
+    console.error(`${provider} 授权失败:`, err)
+    error.value = err.response?.data?.detail || `${provider} 登录暂不可用`
+  }
 }
 </script>
 

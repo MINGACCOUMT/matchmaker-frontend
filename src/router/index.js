@@ -7,6 +7,7 @@ import Matches from '@/views/Matches.vue'
 import Chat from '@/views/Chat.vue'
 import Settings from '@/views/Settings.vue'
 import Welcome from '@/views/Welcome.vue'
+import OAuthCallback from '@/views/OAuthCallback.vue'
 
 const routes = [
   {
@@ -23,6 +24,11 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/oauth/callback',
+    name: 'OAuthCallback',
+    component: OAuthCallback
   },
   {
     path: '/welcome',

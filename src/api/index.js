@@ -44,11 +44,20 @@ export default api
 export const authAPI = {
   register: (data) => api.post('/api/auth/register', data),
   login: (data) => api.post('/api/auth/login', data),
+  forgotPassword: (data) => api.post('/api/auth/forgot-password', data),
+  resetPassword: (data) => api.post('/api/auth/reset-password', data),
   logout: () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     return Promise.resolve({ success: true })
   }
+}
+
+export const oauthAPI = {
+  getAuthorizeUrl: (provider) => api.get(`/api/auth/oauth/${provider}/authorize`),
+  callback: (provider, code, state) => api.get(`/api/auth/oauth/${provider}/callback`, {
+    params: { code, state }
+  })
 }
 
 export const userAPI = {
