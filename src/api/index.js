@@ -66,5 +66,5 @@ export const matchAPI = {
 export const chatAPI = {
   getConversations: () => api.get('/api/chat/conversations'),
   getMessages: (conversationId) => api.get(`/api/chat/messages/${conversationId}`),
-  sendMessage: (data) => api.post('/api/chat/send', data)
+  sendMessage: (data) => api.post('/api/chat/messages', data)
 }
