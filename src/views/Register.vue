@@ -288,9 +288,12 @@ const handleRegister = async () => {
 
   try {
     const payload = {
-      ...formData.value,
+      email: formData.value.email,
+      password: formData.value.password,
+      nickname: formData.value.nickname,
       gender: parseInt(formData.value.gender) || 0,
       birth_date: formData.value.birth_date || null,
+      bio: formData.value.bio || null,
       tags: formData.value.tags
         ? JSON.stringify(formData.value.tags.split(',').map(t => t.trim()).filter(Boolean))
         : '[]'
@@ -307,7 +310,14 @@ const handleRegister = async () => {
     router.push('/welcome')
   } catch (err) {
     console.error('注册失败:', err)
-    error.value = err.response?.data?.detail || err.message || '注册失败，请重试'
+    let msg = '注册失败，请重试'
+    if (err.response?.data?.detail) {
+      const detail = err.response.data.detail
+      msg = Array.isArray(detail) ? detail.map(d => d.msg).join('; ') : detail
+    } else if (err.message) {
+      msg = err.message
+    }
+    error.value = msg
   } finally {
     loading.value = false
   }
