@@ -172,7 +172,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
-import { userAPI } from '@/api'
+import api, { userAPI } from '@/api'
 
 const router = useRouter()
 
@@ -207,33 +207,6 @@ const triggerFileInput = () => {
   fileInput.value?.click()
 }
 
-const compressImage = (file, maxWidth = 300, maxHeight = 300, quality = 0.8) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const img = new Image()
-      img.onload = () => {
-        let { width, height } = img
-        if (width > maxWidth || height > maxHeight) {
-          const ratio = Math.min(maxWidth / width, maxHeight / height)
-          width *= ratio
-          height *= ratio
-        }
-        const canvas = document.createElement('canvas')
-        canvas.width = width
-        canvas.height = height
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, width, height)
-        resolve(canvas.toDataURL('image/jpeg', quality))
-      }
-      img.onerror = reject
-      img.src = e.target.result
-    }
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
-
 const handleAvatarChange = async (e) => {
   const file = e.target.files?.[0]
   if (!file) return
@@ -246,13 +219,21 @@ const handleAvatarChange = async (e) => {
     return
   }
 
+  // 本地预览
+  avatarPreview.value = URL.createObjectURL(file)
+
+  // 上传头像到后端
   try {
-    const base64 = await compressImage(file)
-    avatarPreview.value = base64
-    formData.value.avatar_url = base64
+    const formDataUpload = new FormData()
+    formDataUpload.append('file', file)
+    const response = await api.post('/api/upload-avatar', formDataUpload, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    formData.value.avatar_url = response.file_url
+    alert('头像上传成功')
   } catch (err) {
-    console.error('图片处理失败:', err)
-    alert('图片处理失败')
+    console.error('头像上传失败:', err)
+    alert('头像上传失败，请重试')
   }
 }
 
