@@ -295,48 +295,95 @@ export default function Dashboard() {
     .slice(0, 3);
 
   const displayName = user?.nickname || user?.name || 'there';
+  const matchCount = recentMatchUsers.length;
+  const stats = [
+    {
+      label: '今日浏览',
+      value: 128,
+      delta: '+12%',
+      icon: Eye,
+      colorClass: 'text-sky-500',
+      ringClass: 'stroke-sky-500',
+      trackClass: 'stroke-sky-100 dark:stroke-sky-950/40',
+      badgeClass: 'bg-sky-500/12 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400',
+      panelClass: 'from-sky-50/90 via-white to-white dark:from-sky-950/20 dark:via-[#171717] dark:to-[#141414]',
+      progress: Math.min(128 / 180, 1),
+    },
+    {
+      label: '新匹配',
+      value: 24,
+      delta: '+5%',
+      icon: Heart,
+      colorClass: 'text-primary-500',
+      ringClass: 'stroke-primary-500',
+      trackClass: 'stroke-pink-100 dark:stroke-fuchsia-950/40',
+      badgeClass: 'bg-primary-500/12 text-primary-600 dark:bg-primary-500/15 dark:text-primary-400',
+      panelClass: 'from-pink-50/90 via-white to-white dark:from-fuchsia-950/20 dark:via-[#171717] dark:to-[#141414]',
+      progress: Math.min(24 / 36, 1),
+    },
+    {
+      label: '未读消息',
+      value: unreadCount,
+      delta: '+3%',
+      icon: MessageCircle,
+      colorClass: 'text-orange-500',
+      ringClass: 'stroke-orange-500',
+      trackClass: 'stroke-orange-100 dark:stroke-orange-950/40',
+      badgeClass: 'bg-orange-500/12 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400',
+      panelClass: 'from-orange-50/90 via-white to-white dark:from-orange-950/20 dark:via-[#171717] dark:to-[#141414]',
+      progress: Math.min(unreadCount / 12, 1),
+    },
+  ] as const;
 
   return (
     <motion.div
-      className="min-h-screen bg-[#F8F9FA] dark:bg-[#0F0F0F]"
+      className="min-h-screen bg-[#F7F8FC] text-gray-900 dark:bg-[#0F0F10] dark:text-white"
       variants={pageVariants}
       initial="hidden"
       animate="visible"
     >
-      <div className="mx-auto max-w-md min-h-screen">
-        <header className="sticky top-0 z-50 h-14 bg-white/80 dark:bg-[#1A1A1A]/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
-          <div className="flex h-full items-center justify-between px-4 max-w-md mx-auto">
+      <div className="mx-auto min-h-screen max-w-md">
+        <header className="sticky top-0 z-50 overflow-hidden border-b border-gray-100/50 bg-white/60 backdrop-blur-xl dark:border-gray-800/50 dark:bg-[#1A1A1A]/60">
+          <div
+            className="pointer-events-none absolute inset-0 dark:hidden"
+            style={{ backgroundImage: 'linear-gradient(135deg, rgba(255,64,129,0.08) 0%, rgba(156,39,176,0.06) 50%, transparent 100%)' }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0 hidden dark:block"
+            style={{ backgroundImage: 'linear-gradient(135deg, rgba(255,64,129,0.16) 0%, rgba(156,39,176,0.12) 50%, transparent 100%)' }}
+          />
+          <div className="relative mx-auto flex h-[76px] max-w-md items-center justify-between px-4">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 via-fuchsia-500 to-violet-500 p-[2px]">
+                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-pink-500 via-fuchsia-500 to-violet-500 p-[2px] shadow-[0_10px_24px_rgba(236,72,153,0.28)]">
                   <img
                     src={getAvatar(user || undefined)}
                     alt={displayName}
-                    className="h-full w-full rounded-full object-cover bg-white dark:bg-neutral-900"
+                    className="h-full w-full rounded-full bg-white object-cover dark:bg-[#101010]"
                   />
                 </div>
-                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-success dark:border-[#1A1A1A]" />
+                <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 dark:border-[#1A1A1A]" />
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Welcome back</p>
-                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Hi, {displayName}</h1>
+                <p className="text-[12px] text-gray-500 dark:text-gray-400">Welcome back</p>
+                <h1 className="text-[16px] font-bold tracking-[0.01em] text-gray-900 dark:text-white">Hi, {displayName}</h1>
               </div>
             </div>
-              <button
-                type="button"
-                onClick={() => navigate('/chat')}
-                className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 shadow-sm dark:text-gray-200"
-                aria-label="通知"
-              >
-                <Bell className="h-5 w-5" />
-                {unreadCount > 0 && (
-                  <motion.span
-                    className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-error"
-                    animate={{ scale: [1, 1.25, 1], opacity: [1, 0.6, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-                )}
-              </button>
+            <button
+              type="button"
+              onClick={() => navigate('/chat')}
+              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-gray-700 shadow-sm ring-1 ring-black/5 transition-transform hover:scale-[1.03] dark:bg-[#2A2A2A]/80 dark:text-gray-100 dark:ring-white/5"
+              aria-label="通知"
+            >
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <motion.span
+                  className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500"
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              )}
+            </button>
           </div>
         </header>
 
@@ -351,12 +398,15 @@ export default function Dashboard() {
               <motion.button
                 key={action.label}
                 type="button"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ y: -4, scale: 1.08, boxShadow: '0 18px 32px rgba(0,0,0,0.20)' }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate(action.path)}
-                className="flex flex-col items-center gap-2 rounded-2xl bg-white px-2 py-3 shadow-sm dark:bg-white/5"
+                className="flex flex-col items-center gap-2 rounded-[22px] bg-white/70 px-2 py-3 backdrop-blur-sm dark:bg-white/5"
               >
-                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${action.gradient}`}>
+                <div
+                  className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${action.gradient}`}
+                  style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }}
+                >
                   <action.icon className="h-6 w-6 text-white" />
                 </div>
                 <span className="text-[12px] font-medium text-gray-700 dark:text-gray-200">{action.label}</span>
@@ -365,33 +415,52 @@ export default function Dashboard() {
           </motion.section>
 
           {loading ? (
-            <div className="grid grid-cols-3 gap-3">
-              <SkeletonBlock className="h-28" />
-              <SkeletonBlock className="h-28" />
-              <SkeletonBlock className="h-28" />
-            </div>
+            <motion.section variants={itemVariants} className="grid grid-cols-3 gap-3">
+              <SkeletonBlock className="h-[124px] rounded-[24px]" />
+              <SkeletonBlock className="h-[124px] rounded-[24px]" />
+              <SkeletonBlock className="h-[124px] rounded-[24px]" />
+            </motion.section>
           ) : (
             <motion.section variants={itemVariants} className="grid grid-cols-3 gap-3">
-              {[
-                { label: '今日浏览', value: 128, delta: '+12%', icon: Eye, tone: 'text-sky-500 bg-sky-500/10' },
-                { label: '新匹配', value: 24, delta: '+5%', icon: Heart, tone: 'text-pink-500 bg-pink-500/10' },
-                { label: '未读消息', value: unreadCount, delta: '+3%', icon: MessageCircle, tone: 'text-orange-500 bg-orange-500/10' },
-              ].map((stat) => (
-                <motion.div
-                  key={stat.label}
-                  whileHover={{ y: -2, boxShadow: '0 12px 28px rgba(15, 23, 42, 0.10)' }}
-                  className="rounded-2xl bg-white p-4 shadow-sm dark:bg-white/5"
-                >
-                  <div className="mb-3 flex items-start justify-between">
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${stat.tone}`}>
-                      <stat.icon className="h-4 w-4" />
+              {stats.map((stat) => {
+                const radius = 12;
+                const circumference = 2 * Math.PI * radius;
+                const dashOffset = circumference * (1 - stat.progress);
+
+                return (
+                  <motion.div
+                    key={stat.label}
+                    whileHover={{ y: -3, boxShadow: '0 16px 30px rgba(15, 23, 42, 0.12)' }}
+                    className={`overflow-hidden rounded-[24px] border border-white/70 bg-gradient-to-br ${stat.panelClass} p-3 shadow-[0_10px_24px_rgba(15,23,42,0.06)] dark:border-white/5`}
+                  >
+                    <div className="mb-3 flex items-start justify-between gap-2">
+                      <div className="relative h-8 w-8 shrink-0">
+                        <svg className="h-8 w-8 -rotate-90" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                          <circle cx="16" cy="16" r={radius} strokeWidth="4" className={stat.trackClass} />
+                          <circle
+                            cx="16"
+                            cy="16"
+                            r={radius}
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            className={stat.ringClass}
+                            strokeDasharray={circumference}
+                            strokeDashoffset={dashOffset}
+                          />
+                        </svg>
+                        <div className={`absolute inset-0 flex items-center justify-center ${stat.colorClass}`}>
+                          <stat.icon className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${stat.badgeClass}`}>
+                        {stat.delta}
+                      </span>
                     </div>
-                    <span className="text-[10px] font-semibold text-emerald-500">{stat.delta}</span>
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
-                  <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{stat.label}</div>
-                </motion.div>
-              ))}
+                    <div className="text-[24px] font-bold leading-none text-gray-900 dark:text-white">{stat.value}</div>
+                    <div className="mt-2 text-[11px] text-gray-500 dark:text-gray-400">{stat.label}</div>
+                  </motion.div>
+                );
+              })}
             </motion.section>
           )}
 
@@ -401,7 +470,7 @@ export default function Dashboard() {
               <button
                 type="button"
                 onClick={() => navigate('/discover')}
-                className="flex items-center text-sm text-pink-500"
+                className="flex items-center text-sm font-medium text-pink-500"
               >
                 查看更多
                 <ChevronRight className="h-4 w-4" />
@@ -410,68 +479,103 @@ export default function Dashboard() {
 
             {loading ? (
               <div className="flex gap-3 overflow-x-auto pb-2">
-                <SkeletonBlock className="h-[304px] w-[200px] shrink-0" />
-                <SkeletonBlock className="h-[304px] w-[200px] shrink-0" />
-                <SkeletonBlock className="h-[304px] w-[200px] shrink-0" />
+                <SkeletonBlock className="h-[352px] w-[210px] shrink-0 rounded-[28px]" />
+                <SkeletonBlock className="h-[352px] w-[210px] shrink-0 rounded-[28px]" />
+                <SkeletonBlock className="h-[352px] w-[210px] shrink-0 rounded-[28px]" />
               </div>
             ) : (
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {recommendedUsers.map((recommendedUser) => {
                   const liked = likedIds.includes(recommendedUser.id);
-                  const interestTags = (recommendedUser.interests || []).slice(0, 2);
+                  const interestTags = (recommendedUser.interests || []).slice(0, 3);
                   const matchScore = recommendedUser.match_score || 92;
+                  const profileName = recommendedUser.nickname || recommendedUser.name || 'User';
+                  const showVip = !recommendedUser.online && matchScore >= 96;
 
                   return (
-                    <motion.button
+                    <motion.div
                       key={recommendedUser.id}
-                      type="button"
-                      whileHover={{ scale: 1.03 }}
-                      onClick={() => navigate('/discover')}
-                      className="w-[200px] shrink-0 overflow-hidden rounded-2xl bg-white text-left shadow-sm dark:bg-white/5"
+                      whileHover={{ y: -4, scale: 1.02 }}
+                      className="w-[210px] shrink-0 overflow-hidden rounded-[28px] border border-white/70 bg-white/85 text-left shadow-[0_18px_32px_rgba(15,23,42,0.10)] backdrop-blur-sm dark:border-white/5 dark:bg-[#171717]/90"
                     >
-                      <div className="relative h-[220px]">
-                        <img
-                          src={getAvatar(recommendedUser)}
-                          alt={recommendedUser.nickname || recommendedUser.name || 'User'}
-                          className="h-full w-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                        <div className="absolute right-3 top-3 rounded-full bg-white/85 px-2 py-1 text-xs font-semibold text-pink-500 backdrop-blur">
-                          {matchScore}%
-                        </div>
-                        <div className="absolute bottom-3 left-3 right-3 text-white">
-                          <div className="text-base font-semibold">
-                            {recommendedUser.nickname || recommendedUser.name || 'User'}
-                            {recommendedUser.age ? `, ${recommendedUser.age}` : ''}
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => navigate('/discover')}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            navigate('/discover');
+                          }
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <div className="relative h-[260px] overflow-hidden">
+                          <img
+                            src={getAvatar(recommendedUser)}
+                            alt={profileName}
+                            className="h-full w-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          <div className="absolute left-3 top-3 flex items-center gap-2">
+                            {showVip ? (
+                              <span className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 text-[10px] font-bold text-white shadow-lg">
+                                VIP
+                              </span>
+                            ) : recommendedUser.online ? (
+                              <span className="rounded-full bg-emerald-500/92 px-2.5 py-1 text-[10px] font-semibold text-white shadow-lg backdrop-blur-sm">
+                                在线
+                              </span>
+                            ) : null}
                           </div>
-                          <div className="text-xs text-white/80">{recommendedUser.city || 'Unknown city'}</div>
+                          <div className="absolute right-3 top-3 rounded-full bg-white/92 px-2.5 py-1 text-[11px] font-semibold text-pink-500 shadow-sm backdrop-blur-[8px] dark:bg-[#202020]/92 dark:text-pink-300">
+                            {matchScore}% 匹配
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                            <div className="text-[18px] font-bold leading-tight">
+                              {profileName}
+                              {recommendedUser.age ? `, ${recommendedUser.age}` : ''}
+                            </div>
+                            <div className="mt-1 text-xs text-white/80">
+                              {[recommendedUser.city, recommendedUser.occupation].filter(Boolean).join(' · ') || '正在等待你发现'}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between gap-2 p-3">
-                        <div className="flex flex-wrap gap-1.5">
-                          {interestTags.map((interest) => (
-                            <span
-                              key={interest}
-                              className="rounded-full bg-gray-100 px-2 py-1 text-[10px] font-medium text-gray-600 dark:bg-white/10 dark:text-gray-300"
-                            >
-                              {interest}
+                      <div className="space-y-3 p-3">
+                        <div className="flex min-h-[44px] flex-wrap gap-2">
+                          {interestTags.length > 0 ? (
+                            interestTags.map((interest) => (
+                              <span
+                                key={interest}
+                                className="rounded-full bg-gray-100/95 px-2.5 py-1 text-[10px] font-medium text-gray-600 dark:bg-white/8 dark:text-gray-300"
+                              >
+                                {interest}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="rounded-full bg-gray-100/95 px-2.5 py-1 text-[10px] font-medium text-gray-500 dark:bg-white/8 dark:text-gray-400">
+                              等你来认识
                             </span>
-                          ))}
+                          )}
                         </div>
-                        <motion.button
-                          type="button"
-                          whileTap={{ scale: 0.95 }}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            void handleLike(recommendedUser.id);
-                          }}
-                          className={`flex h-9 w-9 items-center justify-center rounded-full ${liked ? 'bg-pink-500 text-white' : 'bg-pink-50 text-pink-500 dark:bg-white/10'}`}
-                          aria-label="Like user"
-                        >
-                          <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} />
-                        </motion.button>
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-[11px] text-gray-500 dark:text-gray-400">心动值持续上升中</div>
+                          <motion.button
+                            type="button"
+                            whileTap={{ scale: 0.95 }}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              void handleLike(recommendedUser.id);
+                            }}
+                            className={`flex h-10 w-10 items-center justify-center rounded-full shadow-sm transition-colors ${liked ? 'bg-pink-500 text-white' : 'bg-pink-50 text-pink-500 dark:bg-white/10 dark:text-pink-300'}`}
+                            aria-label="Like user"
+                          >
+                            <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} />
+                          </motion.button>
+                        </div>
                       </div>
-                    </motion.button>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -484,7 +588,7 @@ export default function Dashboard() {
               <button
                 type="button"
                 onClick={() => navigate('/matches')}
-                className="flex items-center text-sm text-pink-500"
+                className="flex items-center text-sm font-medium text-pink-500"
               >
                 查看全部
                 <ChevronRight className="h-4 w-4" />
@@ -492,35 +596,72 @@ export default function Dashboard() {
             </div>
 
             {loading ? (
-              <SkeletonBlock className="h-20 w-full" />
+              <SkeletonBlock className="h-[132px] w-full rounded-[28px]" />
             ) : (
-              <div className="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm dark:bg-white/5">
-                <div className="flex -space-x-3">
-                  {recentMatchUsers.map((matchUser) => (
-                    <div key={matchUser.id} className="relative">
-                      <div className="h-12 w-12 rounded-full bg-gradient-to-br from-pink-500 via-fuchsia-500 to-violet-500 p-[2px]">
-                        <img
-                          src={getAvatar(matchUser)}
-                          alt={matchUser.nickname || matchUser.name || 'User'}
-                          className="h-full w-full rounded-full object-cover bg-white dark:bg-neutral-900"
-                        />
-                      </div>
-                      <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 dark:border-[#0F0F0F]" />
+              <div className="relative overflow-hidden rounded-[28px] border border-white/70 bg-white/85 p-4 shadow-[0_18px_32px_rgba(15,23,42,0.10)] backdrop-blur-sm dark:border-white/5 dark:bg-[#171717]/90">
+                <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br from-pink-500/20 via-fuchsia-500/15 to-violet-500/10 blur-sm dark:from-pink-500/15 dark:via-fuchsia-500/15 dark:to-violet-500/10" />
+                <div className="relative flex items-center gap-4">
+                  <div className="flex -space-x-3">
+                    {recentMatchUsers.map((matchUser, index) => {
+                      const name = matchUser.nickname || matchUser.name || 'User';
+
+                      return index === 0 ? (
+                        <motion.div
+                          key={matchUser.id}
+                          className="relative"
+                          animate={{
+                            boxShadow: [
+                              '0 0 0 0 rgba(236,72,153,0.00)',
+                              '0 0 0 8px rgba(236,72,153,0.12)',
+                              '0 0 0 16px rgba(236,72,153,0.00)',
+                            ],
+                          }}
+                          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        >
+                          <div className="h-14 w-14 rounded-full bg-gradient-to-br from-pink-500 via-fuchsia-500 to-violet-500 p-[2px]">
+                            <img
+                              src={getAvatar(matchUser)}
+                              alt={name}
+                              className="h-full w-full rounded-full bg-white object-cover dark:bg-[#101010]"
+                            />
+                          </div>
+                          <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 dark:border-[#171717]" />
+                        </motion.div>
+                      ) : (
+                        <div key={matchUser.id} className="relative">
+                          <div className="h-14 w-14 rounded-full bg-gradient-to-br from-pink-500 via-fuchsia-500 to-violet-500 p-[2px]">
+                            <img
+                              src={getAvatar(matchUser)}
+                              alt={name}
+                              className="h-full w-full rounded-full bg-white object-cover dark:bg-[#101010]"
+                            />
+                          </div>
+                          <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 dark:border-[#171717]" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-2">
+                      <span className="rounded-full bg-pink-500/12 px-2 py-1 text-[10px] font-bold text-pink-600 dark:bg-pink-500/15 dark:text-pink-300">
+                        NEW
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {matchCount > 0 ? `${matchCount}位新匹配` : '新的缘分已靠近'}
+                      </span>
                     </div>
-                  ))}
+                    <div className="text-sm font-medium text-gray-700 dark:text-gray-200">别让缘分溜走</div>
+                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">现在打个招呼，也许就会有故事开始。</div>
+                  </div>
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate('/matches')}
+                    className="rounded-2xl bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(236,72,153,0.28)]"
+                  >
+                    打招呼
+                  </motion.button>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-gray-900 dark:text-white">3位新匹配</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">现在去打个招呼吧</div>
-                </div>
-                <motion.button
-                  type="button"
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate('/matches')}
-                  className="rounded-xl bg-pink-500 px-4 py-2 text-sm font-medium text-white"
-                >
-                  打招呼
-                </motion.button>
               </div>
             )}
           </motion.section>
