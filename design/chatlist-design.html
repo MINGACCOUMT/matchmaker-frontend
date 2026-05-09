@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>心动 - 消息</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#FFF0F5', 100: '#FFD1E8', 200: '#FFA3D1', 300: '#FF75BA',
+              400: '#FF4A9F', 500: '#FF4081', 600: '#E91E63', 700: '#C2185B',
+              800: '#AD1457', 900: '#880E4F',
+            },
+            secondary: {
+              50: '#F3E5F5', 100: '#E1BEE7', 200: '#CE93D8', 300: '#BA68C8',
+              400: '#AB47BC', 500: '#9C27B0', 600: '#8E24AA', 700: '#7B1FA2',
+              800: '#6A1B9A', 900: '#4A148C',
+            },
+          },
+          fontFamily: { sans: ['Noto Sans SC', 'system-ui', '-apple-system', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif; background: #F8F9FA; }
+    .dark body { background: #0F0F0F; }
+    .card-shadow { box-shadow: 0 2px 12px rgba(255, 64, 129, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04); }
+    .dark .card-shadow { box-shadow: 0 2px 12px rgba(255, 64, 129, 0.12), 0 1px 4px rgba(0, 0, 0, 0.3); }
+    .avatar-ring { background: linear-gradient(135deg, #FF4081 0%, #9C27B0 100%); padding: 2px; border-radius: 50%; }
+    .chat-item { transition: all 0.2s ease; }
+    .chat-item:hover { background: rgba(255, 64, 129, 0.04); }
+    .chat-item:active { background: rgba(255, 64, 129, 0.08); }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .pulse-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.2); } }
+    .slide-in { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  </style>
+</head>
+<body class="antialiased">
+  <div class="max-w-md mx-auto min-h-screen bg-gray-50 dark:bg-[#0F0F0F] relative pb-20">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#1A1A1A]/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
+      <div class="px-5 py-3 flex items-center justify-between">
+        <h1 class="text-lg font-bold text-gray-900 dark:text-white">消息</h1>
+        <div class="flex items-center gap-3">
+          <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </button>
+          <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative">
+            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary-500 rounded-full pulse-dot"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 消息列表 -->
+    <main class="divide-y divide-gray-100 dark:divide-gray-800">
+
+      <!-- 会话项 1 - 有未读 -->
+      <div class="chat-item px-4 py-3.5 flex items-center gap-3 cursor-pointer slide-in" style="animation-delay: 0s;">
+        <div class="relative flex-shrink-0">
+          <div class="avatar-ring">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" alt="头像" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+          </div>
+          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-0.5">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">小雅</h3>
+            <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">14:32</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400 truncate pr-2">周末有空一起喝咖啡吗？我知道一家很棒的店 ☕️</p>
+            <span class="flex-shrink-0 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">3</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 会话项 2 - 有未读 -->
+      <div class="chat-item px-4 py-3.5 flex items-center gap-3 cursor-pointer slide-in" style="animation-delay: 0.05s;">
+        <div class="relative flex-shrink-0">
+          <div class="avatar-ring">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="头像" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+          </div>
+          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-0.5">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">浩然</h3>
+            <span class="text-xs text-primary-500 font-medium flex-shrink-0">刚刚</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400 truncate pr-2">[图片] 给你看我今天拍的日落 🌅</p>
+            <span class="flex-shrink-0 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 会话项 3 - 已读 -->
+      <div class="chat-item px-4 py-3.5 flex items-center gap-3 cursor-pointer slide-in" style="animation-delay: 0.1s;">
+        <div class="relative flex-shrink-0">
+          <div class="avatar-ring">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="头像" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+          </div>
+          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-gray-400 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-0.5">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">思琪</h3>
+            <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">昨天</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-500 dark:text-gray-500 truncate pr-2">好的，那周六下午见～</p>
+            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 会话项 4 -->
+      <div class="chat-item px-4 py-3.5 flex items-center gap-3 cursor-pointer slide-in" style="animation-delay: 0.15s;">
+        <div class="relative flex-shrink-0">
+          <div class="avatar-ring">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="头像" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+          </div>
+          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-gray-400 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-0.5">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">大伟</h3>
+            <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">周一</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-500 dark:text-gray-500 truncate pr-2">哈哈，确实很有趣 😄</p>
+            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 会话项 5 -->
+      <div class="chat-item px-4 py-3.5 flex items-center gap-3 cursor-pointer slide-in" style="animation-delay: 0.2s;">
+        <div class="relative flex-shrink-0">
+          <div class="avatar-ring">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=face" alt="头像" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+          </div>
+          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-0.5">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">梦婷</h3>
+            <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">3天前</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-500 dark:text-gray-500 truncate pr-2">谢谢你的推荐，电影很好看！</p>
+            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 会话项 6 -->
+      <div class="chat-item px-4 py-3.5 flex items-center gap-3 cursor-pointer slide-in" style="animation-delay: 0.25s;">
+        <div class="relative flex-shrink-0">
+          <div class="avatar-ring">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" alt="头像" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+          </div>
+          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-gray-400 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-0.5">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">伟明</h3>
+            <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">上周</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-500 dark:text-gray-500 truncate pr-2">最近工作比较忙，改天再聊</p>
+            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 会话项 7 -->
+      <div class="chat-item px-4 py-3.5 flex items-center gap-3 cursor-pointer slide-in" style="animation-delay: 0.3s;">
+        <div class="relative flex-shrink-0">
+          <div class="avatar-ring">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="头像" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+          </div>
+          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-gray-400 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-0.5">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">晓雯</h3>
+            <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">05-01</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-500 dark:text-gray-500 truncate pr-2">系统提示：你们已相互喜欢，可以开始聊天了 💕</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- 底部导航 -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#1A1A1A]/90 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 max-w-md mx-auto">
+      <div class="flex items-center justify-around py-2">
+        <button class="flex flex-col items-center gap-1 px-4 py-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span class="text-[10px] font-medium text-gray-400 dark:text-gray-500">首页</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 px-4 py-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span class="text-[10px] font-medium text-gray-400 dark:text-gray-500">发现</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 px-4 py-1 rounded-xl bg-primary-50 dark:bg-primary-900/20 relative">
+          <svg class="w-6 h-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+          <span class="absolute -top-0.5 right-2 w-4 h-4 bg-primary-500 rounded-full text-[8px] text-white flex items-center justify-center font-bold">4</span>
+          <span class="text-[10px] font-medium text-primary-500">消息</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 px-4 py-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span class="text-[10px] font-medium text-gray-400 dark:text-gray-500">我的</span>
+        </button>
+      </div>
+      <div class="h-safe-area-inset-bottom"></div>
+    </nav>
+
+  </div>
+
+  <button onclick="document.documentElement.classList.toggle('dark')" class="fixed bottom-24 right-4 z-50 w-12 h-12 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition-transform">🌓</button>
+
+  <style>
+    .h-safe-area-inset-bottom { height: env(safe-area-inset-bottom, 0px); }
+    @media (min-width: 640px) { body { background: #E5E7EB; } .dark body { background: #111827; } }
+  </style>
+</body>
+</html>
