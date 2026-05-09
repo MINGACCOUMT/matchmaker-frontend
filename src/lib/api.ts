@@ -1,12 +1,59 @@
 "use client";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+type ApiRecord = Record<string, unknown>;
 
 function getToken() {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('token');
   }
   return null;
+}
+
+function isRecord(value: unknown): value is ApiRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function getErrorMessage(body: unknown, fallback: string) {
+  if (typeof body === 'string' && body.trim()) {
+    return body.trim();
+  }
+
+  if (!isRecord(body)) {
+    return fallback;
+  }
+
+  const detail = body.detail;
+  if (typeof detail === 'string' && detail.trim()) {
+    return detail.trim();
+  }
+
+  const message = body.message;
+  if (typeof message === 'string' && message.trim()) {
+    return message.trim();
+  }
+
+  const error = body.error;
+  if (typeof error === 'string' && error.trim()) {
+    return error.trim();
+  }
+
+  return fallback;
+}
+
+async function parseResponseBody(res: Response) {
+  if (res.status === 204) {
+    return null;
+  }
+
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    return res.json().catch(() => null);
+  }
+
+  const text = await res.text().catch(() => '');
+  return text || null;
 }
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
@@ -24,12 +71,13 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     headers,
   });
 
+  const body = await parseResponseBody(res);
+
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: 'Request failed' }));
-    throw new Error(err.detail || 'Request failed');
+    throw new Error(getErrorMessage(body, res.statusText || 'Request failed'));
   }
 
-  return res.json();
+  return body;
 }
 
 export async function login(email: string, password: string) {

@@ -8,6 +8,40 @@ import Navbar from '@/components/Navbar';
 import Toast from '@/components/ui/Toast';
 import { pageTransition } from '@/lib/animations';
 
+type ApiRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is ApiRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function getAuthToken(value: unknown): string | null {
+  if (!isRecord(value)) return null;
+
+  const directToken = value.access_token;
+  if (typeof directToken === 'string' && directToken) return directToken;
+
+  const nestedData = value.data;
+  if (isRecord(nestedData)) {
+    const nestedToken = nestedData.access_token ?? nestedData.token;
+    if (typeof nestedToken === 'string' && nestedToken) return nestedToken;
+  }
+
+  const directAltToken = value.token;
+  if (typeof directAltToken === 'string' && directAltToken) return directAltToken;
+
+  return null;
+}
+
+function getAuthUser(value: unknown) {
+  if (!isRecord(value)) return null;
+
+  if (isRecord(value.user)) return value.user;
+  if (isRecord(value.data) && isRecord(value.data.user)) return value.data.user;
+  if (isRecord(value.profile)) return value.profile;
+
+  return null;
+}
+
 export default function Register() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -31,8 +65,20 @@ export default function Register() {
         gender: Number(form.gender),
         tags: form.tags ? JSON.stringify(form.tags.split(',').map((t: string) => t.trim())) : '[]',
       });
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      const token = getAuthToken(data);
+      const user = getAuthUser(data);
+
+      if (!token) {
+        throw new Error('注册成功，但未收到有效 token');
+      }
+
+      localStorage.setItem('token', token);
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('user');
+      }
+
       setToast({ visible: true, message: '注册成功', variant: 'success' });
       setTimeout(() => navigate('/discover'), 800);
     } catch (err: any) {
