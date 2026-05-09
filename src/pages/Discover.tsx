@@ -40,7 +40,8 @@ export default function Discover() {
     setLoading(true);
     try {
       const data = await discoverUsers();
-      setUsers(data);
+      const list = Array.isArray(data) ? data : data?.users || [];
+      setUsers(list);
       setCurrent(0);
     } catch (err) {
       console.error(err);
