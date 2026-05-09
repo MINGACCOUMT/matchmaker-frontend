@@ -106,44 +106,44 @@ export async function register(data: Record<string, any>) {
 }
 
 export async function getMe() {
-  return apiFetch('/api/users/me');
+  return apiFetch('/api/v1/users/me');
 }
 
 export async function updateMe(data: Record<string, any>) {
-  return apiFetch('/api/users/me', {
+  return apiFetch('/api/v1/users/me', {
     method: 'PUT',
     body: JSON.stringify(data),
   });
 }
 
 export async function discoverUsers() {
-  return apiFetch('/api/users/discover');
+  return apiFetch('/api/v1/users/discover');
 }
 
 export async function likeUser(toUserId: number) {
-  return apiFetch('/api/matches/like', {
+  return apiFetch('/api/v1/matches/like', {
     method: 'POST',
     body: JSON.stringify({ to_user_id: toUserId }),
   });
 }
 
 export async function getMatches() {
-  return apiFetch('/api/matches');
+  return apiFetch('/api/v1/matches');
 }
 
 export async function getMessages(convId: string) {
-  return apiFetch(`/api/chat/messages/${convId}`);
+  return apiFetch(`/api/v1/chat/messages/${convId}`);
 }
 
 export async function sendMessage(convId: string, content: string) {
-  return apiFetch('/api/chat/messages', {
+  return apiFetch('/api/v1/chat/messages', {
     method: 'POST',
     body: JSON.stringify({ chat_id: convId, content }),
   });
 }
 
 export async function getConversations() {
-  return apiFetch('/api/chat/conversations');
+  return apiFetch('/api/v1/chat/conversations');
 }
 
 export async function uploadAvatar(file: File) {
