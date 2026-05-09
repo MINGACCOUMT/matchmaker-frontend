@@ -45,7 +45,7 @@ const pageVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+    transition: { duration: 0.4, ease: 'easeOut' as const },
   },
 };
 
@@ -55,7 +55,7 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+    transition: { duration: 0.35, ease: 'easeOut' as const },
   },
 };
 

@@ -36,7 +36,7 @@ const pageVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+    transition: { duration: 0.35, ease: 'easeOut' as const },
   },
 };
 
@@ -53,7 +53,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] },
+    transition: { duration: 0.28, ease: 'easeOut' as const },
   },
 };
 
@@ -179,11 +179,12 @@ function normalizeMatches(input: unknown): MatchItem[] {
   return source
     .map((item) => {
       if (!isRecord(item) || typeof item.id !== 'number') return null;
-      return {
-        id: item.id,
-        user: normalizeUser(item.user),
-        other_user: normalizeUser(item.other_user),
-      } satisfies MatchItem;
+      const user = normalizeUser(item.user);
+      const otherUser = normalizeUser(item.other_user);
+      const result: MatchItem = { id: item.id };
+      if (user) result.user = user;
+      if (otherUser) result.other_user = otherUser;
+      return result;
     })
     .filter((item): item is MatchItem => item !== null);
 }
@@ -200,10 +201,10 @@ function normalizeConversations(input: unknown): Conversation[] {
       if (!isRecord(item)) return null;
       const id = asString(item.id) || asString(item.conversation_id);
       if (!id) return null;
-      return {
-        id,
-        unread_count: asNumber(item.unread_count),
-      } satisfies Conversation;
+      const result: Conversation = { id };
+      const unread = asNumber(item.unread_count);
+      if (unread !== undefined) result.unread_count = unread;
+      return result;
     })
     .filter((item): item is Conversation => item !== null);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = 'http://localhost:8000';
 
 type ApiRecord = Record<string, unknown>;
 
@@ -127,7 +127,7 @@ export async function getMessages(convId: string) {
 export async function sendMessage(convId: string, content: string) {
   return apiFetch('/api/chat/messages', {
     method: 'POST',
-    body: JSON.stringify({ conversation_id: convId, content }),
+    body: JSON.stringify({ chat_id: convId, content }),
   });
 }
 
