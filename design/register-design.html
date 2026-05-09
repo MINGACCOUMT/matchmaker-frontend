@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>心动 - 注册</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#FFF0F5', 100: '#FFD1E8', 200: '#FFA3D1', 300: '#FF75BA',
+              400: '#FF4A9F', 500: '#FF4081', 600: '#E91E63', 700: '#C2185B',
+              800: '#AD1457', 900: '#880E4F',
+            },
+            secondary: {
+              50: '#F3E5F5', 100: '#E1BEE7', 200: '#CE93D8', 300: '#BA68C8',
+              400: '#AB47BC', 500: '#9C27B0', 600: '#8E24AA', 700: '#7B1FA2',
+              800: '#6A1B9A', 900: '#4A148C',
+            },
+          },
+          fontFamily: { sans: ['Noto Sans SC', 'system-ui', '-apple-system', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #FF4081 0%, #9C27B0 100%); }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .dark .glass-card {
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .input-field {
+      transition: all 0.3s ease;
+    }
+    .input-field:focus {
+      box-shadow: 0 0 0 3px rgba(255, 64, 129, 0.15);
+    }
+    .step-dot {
+      transition: all 0.3s ease;
+    }
+    .step-dot.active {
+      background: #FF4081;
+      transform: scale(1.2);
+    }
+    .heart-float { animation: heartFloat 3s ease-in-out infinite; }
+    @keyframes heartFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(5deg); } }
+    .tag-pill {
+      transition: all 0.2s ease;
+    }
+    .tag-pill:hover {
+      transform: scale(1.05);
+    }
+    .tag-pill.selected {
+      background: #FF4081;
+      color: white;
+      border-color: #FF4081;
+    }
+  </style>
+</head>
+<body class="antialiased">
+  <div class="max-w-md mx-auto min-h-screen gradient-bg relative flex flex-col items-center px-6 py-6">
+    
+    <!-- 背景装饰 -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+      <div class="absolute bottom-32 right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- 顶部返回 + 步骤指示 -->
+    <div class="w-full flex items-center justify-between mb-6 relative z-10">
+      <button class="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <div class="flex items-center gap-2">
+        <div class="step-dot active w-2.5 h-2.5 rounded-full bg-white/40"></div>
+        <div class="step-dot w-2.5 h-2.5 rounded-full bg-white/40"></div>
+        <div class="step-dot w-2.5 h-2.5 rounded-full bg-white/40"></div>
+      </div>
+      <div class="w-9"></div>
+    </div>
+
+    <!-- Logo -->
+    <div class="relative mb-4 z-10">
+      <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl heart-float">
+        <svg class="w-8 h-8 text-primary-500" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </div>
+    </div>
+
+    <h1 class="text-2xl font-bold text-white mb-1 relative z-10">创建账号</h1>
+    <p class="text-white/80 text-sm mb-6 relative z-10">完善资料，开启心动之旅</p>
+
+    <!-- 注册表单卡片 -->
+    <div class="glass-card w-full rounded-3xl p-6 shadow-2xl relative z-10 flex-1 overflow-y-auto" style="max-height: calc(100vh - 220px);">
+      
+      <!-- 头像上传 -->
+      <div class="flex flex-col items-center mb-5">
+        <div class="relative">
+          <div class="w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer hover:border-primary-500 transition-colors">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center shadow-lg">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          </div>
+        </div>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">点击上传头像</p>
+      </div>
+
+      <!-- 基本信息 -->
+      <div class="space-y-3 mb-5">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">基本信息</h3>
+        
+        <!-- 邮箱 -->
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+            </svg>
+          </div>
+          <input type="email" placeholder="邮箱地址" 
+                 class="input-field w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary-500">
+        </div>
+
+        <!-- 密码 -->
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <input type="password" placeholder="设置密码（至少8位）" 
+                 class="input-field w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary-500">
+        </div>
+
+        <!-- 昵称 -->
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </div>
+          <input type="text" placeholder="昵称" 
+                 class="input-field w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary-500">
+        </div>
+      </div>
+
+      <!-- 个人资料 -->
+      <div class="space-y-3 mb-5">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">个人资料</h3>
+        
+        <!-- 性别选择 -->
+        <div class="flex gap-3">
+          <button class="flex-1 py-2.5 border-2 border-primary-500 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 rounded-xl text-sm font-medium transition-all">
+            <span class="mr-1">👩</span> 女生
+          </button>
+          <button class="flex-1 py-2.5 border-2 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 rounded-xl text-sm font-medium hover:border-primary-300 transition-all">
+            <span class="mr-1">👨</span> 男生
+          </button>
+        </div>
+
+        <!-- 生日 + 城市 -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <input type="text" placeholder="出生日期" 
+                   class="input-field w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary-500">
+          </div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <input type="text" placeholder="所在城市" 
+                   class="input-field w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary-500">
+          </div>
+        </div>
+
+        <!-- 个人介绍 -->
+        <textarea placeholder="介绍一下自己，让更多人了解你..." rows="3"
+                  class="input-field w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary-500 resize-none"></textarea>
+      </div>
+
+      <!-- 兴趣标签 -->
+      <div class="mb-5">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">兴趣标签</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag-pill selected px-3 py-1.5 bg-primary-500 text-white text-xs font-medium rounded-full cursor-pointer border border-primary-500">📸 摄影</span>
+          <span class="tag-pill px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-primary-300">✈️ 旅行</span>
+          <span class="tag-pill px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-primary-300">🎨 绘画</span>
+          <span class="tag-pill selected px-3 py-1.5 bg-primary-500 text-white text-xs font-medium rounded-full cursor-pointer border border-primary-500">🧘 瑜伽</span>
+          <span class="tag-pill px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-primary-300">🎵 音乐</span>
+          <span class="tag-pill px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-primary-300">📚 阅读</span>
+          <span class="tag-pill px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-primary-300">☕ 咖啡</span>
+          <span class="tag-pill px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-primary-300">🏃 跑步</span>
+          <span class="tag-pill px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-primary-300">🍳 美食</span>
+          <span class="tag-pill px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-primary-300">🎮 游戏</span>
+        </div>
+      </div>
+
+      <!-- 注册按钮 -->
+      <button class="w-full py-3.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 hover:-translate-y-0.5 mb-4">
+        创建账号
+      </button>
+
+      <!-- 分隔线 -->
+      <div class="flex items-center gap-3 mb-4">
+        <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+        <span class="text-xs text-gray-400 dark:text-gray-500">或使用以下方式注册</span>
+        <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+      </div>
+
+      <!-- 社交注册 -->
+      <div class="flex gap-3 mb-4">
+        <button class="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">GitHub</span>
+        </button>
+        <button class="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Google</span>
+        </button>
+      </div>
+
+      <!-- 登录引导 -->
+      <div class="text-center">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          已有账号？
+          <a href="#" class="text-primary-500 hover:text-primary-600 font-semibold">立即登录</a>
+        </p>
+      </div>
+    </div>
+
+    <p class="text-white/60 text-xs mt-4 relative z-10">© 2026 心动 App. All rights reserved.</p>
+  </div>
+
+  <button onclick="document.documentElement.classList.toggle('dark')" class="fixed bottom-6 right-6 z-50 w-12 h-12 bg-white/20 backdrop-blur-sm text-white rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition-transform border border-white/30">
+    🌓
+  </button>
+
+  <style>
+    @media (min-width: 640px) { body { background: #E5E7EB; } }
+  </style>
+</body>
+</html>

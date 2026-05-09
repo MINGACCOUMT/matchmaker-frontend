@@ -9,6 +9,8 @@ import ChatList from '@/pages/ChatList';
 import ChatDetail from '@/pages/ChatDetail';
 import Profile from '@/pages/Profile';
 import Dashboard from '@/pages/Dashboard';
+import ForgotPassword from '@/pages/ForgotPassword';
+import Settings from '@/pages/Settings';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -25,6 +27,8 @@ function AnimatedRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="/discover" element={<Discover />} />
         <Route path="/matches" element={<Matches />} />
         <Route path="/chat" element={<ChatList />} />

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>心动 - 匹配列表</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#FFF0F5', 100: '#FFD1E8', 200: '#FFA3D1', 300: '#FF75BA',
+              400: '#FF4A9F', 500: '#FF4081', 600: '#E91E63', 700: '#C2185B',
+              800: '#AD1457', 900: '#880E4F',
+            },
+            secondary: {
+              50: '#F3E5F5', 100: '#E1BEE7', 200: '#CE93D8', 300: '#BA68C8',
+              400: '#AB47BC', 500: '#9C27B0', 600: '#8E24AA', 700: '#7B1FA2',
+              800: '#6A1B9A', 900: '#4A148C',
+            },
+          },
+          fontFamily: { sans: ['Noto Sans SC', 'system-ui', '-apple-system', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif; background: #F8F9FA; }
+    .dark body { background: #0F0F0F; }
+    .card-shadow { box-shadow: 0 2px 12px rgba(255, 64, 129, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04); }
+    .dark .card-shadow { box-shadow: 0 2px 12px rgba(255, 64, 129, 0.12), 0 1px 4px rgba(0, 0, 0, 0.3); }
+    .avatar-ring { background: linear-gradient(135deg, #FF4081 0%, #9C27B0 100%); padding: 2px; border-radius: 50%; }
+    .match-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .match-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(255, 64, 129, 0.15); }
+    .match-card:active { transform: scale(0.98); }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .pulse-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.2); } }
+    .slide-in { animation: slideIn 0.35s ease-out both; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .gradient-bg { background: linear-gradient(135deg, #FF4081 0%, #9C27B0 100%); }
+    .heart-beat { animation: heartBeat 1.5s ease-in-out infinite; }
+    @keyframes heartBeat { 0%, 100% { transform: scale(1); } 14% { transform: scale(1.15); } 28% { transform: scale(1); } 42% { transform: scale(1.15); } 70% { transform: scale(1); } }
+  </style>
+</head>
+<body class="antialiased">
+  <div class="max-w-md mx-auto min-h-screen bg-gray-50 dark:bg-[#0F0F0F] relative pb-20">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#1A1A1A]/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
+      <div class="px-5 py-3 flex items-center justify-between">
+        <h1 class="text-lg font-bold text-gray-900 dark:text-white">我的匹配 <span class="text-primary-500">(6)</span></h1>
+        <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 最近匹配头像栏 -->
+    <section class="px-4 pt-4">
+      <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar pb-2">
+        <div class="flex flex-col items-center gap-1.5 min-w-[72px] cursor-pointer">
+          <div class="relative">
+            <div class="avatar-ring">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" alt="" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+          </div>
+          <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">小雅</span>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 min-w-[72px] cursor-pointer">
+          <div class="relative">
+            <div class="avatar-ring">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+          </div>
+          <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">浩然</span>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 min-w-[72px] cursor-pointer">
+          <div class="relative">
+            <div class="avatar-ring">
+              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-gray-400 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+          </div>
+          <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">思琪</span>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 min-w-[72px] cursor-pointer">
+          <div class="relative">
+            <div class="avatar-ring">
+              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-gray-400 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+          </div>
+          <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">大伟</span>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 min-w-[72px] cursor-pointer">
+          <div class="relative">
+            <div class="avatar-ring">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=face" alt="" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+          </div>
+          <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">梦婷</span>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 min-w-[72px] cursor-pointer">
+          <div class="relative">
+            <div class="avatar-ring">
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-[#0F0F0F]">
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-gray-400 rounded-full border-2 border-white dark:border-[#0F0F0F]"></div>
+          </div>
+          <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">伟明</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 匹配卡片列表 -->
+    <main class="px-4 pt-4 space-y-3">
+
+      <!-- 卡片 1 -->
+      <div class="match-card bg-white dark:bg-[#1A1A1A] rounded-2xl overflow-hidden card-shadow slide-in" style="animation-delay: 0s;">
+        <div class="flex">
+          <div class="relative w-28 h-28 flex-shrink-0">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face" alt="" class="w-full h-full object-cover">
+            <div class="absolute top-2 left-2 bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">98% 匹配</div>
+          </div>
+          <div class="flex-1 p-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">小雅</h3>
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">25岁 · 北京 · 2小时前匹配</p>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-1">"周末有空一起喝咖啡吗？"</p>
+            <div class="flex items-center gap-2 mt-1">
+              <button class="flex-1 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium rounded-lg transition-colors">聊天</button>
+              <button class="px-3 py-1.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">资料</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 2 -->
+      <div class="match-card bg-white dark:bg-[#1A1A1A] rounded-2xl overflow-hidden card-shadow slide-in" style="animation-delay: 0.08s;">
+        <div class="flex">
+          <div class="relative w-28 h-28 flex-shrink-0">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" class="w-full h-full object-cover">
+            <div class="absolute top-2 left-2 bg-secondary-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">95% 匹配</div>
+          </div>
+          <div class="flex-1 p-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">浩然</h3>
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">28岁 · 上海 · 昨天匹配</p>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-1">"给你看我今天拍的日落 🌅"</p>
+            <div class="flex items-center gap-2 mt-1">
+              <button class="flex-1 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium rounded-lg transition-colors">聊天</button>
+              <button class="px-3 py-1.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">资料</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 3 -->
+      <div class="match-card bg-white dark:bg-[#1A1A1A] rounded-2xl overflow-hidden card-shadow slide-in" style="animation-delay: 0.16s;">
+        <div class="flex">
+          <div class="relative w-28 h-28 flex-shrink-0">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face" alt="" class="w-full h-full object-cover">
+            <div class="absolute top-2 left-2 bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">92% 匹配</div>
+          </div>
+          <div class="flex-1 p-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">思琪</h3>
+                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">26岁 · 广州 · 3天前匹配</p>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">好的，那周六下午见～</p>
+            <div class="flex items-center gap-2 mt-1">
+              <button class="flex-1 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium rounded-lg transition-colors">聊天</button>
+              <button class="px-3 py-1.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">资料</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 4 -->
+      <div class="match-card bg-white dark:bg-[#1A1A1A] rounded-2xl overflow-hidden card-shadow slide-in" style="animation-delay: 0.24s;">
+        <div class="flex">
+          <div class="relative w-28 h-28 flex-shrink-0">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face" alt="" class="w-full h-full object-cover">
+            <div class="absolute top-2 left-2 bg-secondary-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">88% 匹配</div>
+          </div>
+          <div class="flex-1 p-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">大伟</h3>
+                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">30岁 · 深圳 · 1周前匹配</p>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">哈哈，确实很有趣 😄</p>
+            <div class="flex items-center gap-2 mt-1">
+              <button class="flex-1 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium rounded-lg transition-colors">聊天</button>
+              <button class="px-3 py-1.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">资料</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 5 -->
+      <div class="match-card bg-white dark:bg-[#1A1A1A] rounded-2xl overflow-hidden card-shadow slide-in" style="animation-delay: 0.32s;">
+        <div class="flex">
+          <div class="relative w-28 h-28 flex-shrink-0">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop&crop=face" alt="" class="w-full h-full object-cover">
+            <div class="absolute top-2 left-2 bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">85% 匹配</div>
+          </div>
+          <div class="flex-1 p-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">梦婷</h3>
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">24岁 · 杭州 · 2周前匹配</p>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">谢谢你的推荐，电影很好看！</p>
+            <div class="flex items-center gap-2 mt-1">
+              <button class="flex-1 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium rounded-lg transition-colors">聊天</button>
+              <button class="px-3 py-1.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">资料</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 6 -->
+      <div class="match-card bg-white dark:bg-[#1A1A1A] rounded-2xl overflow-hidden card-shadow slide-in" style="animation-delay: 0.40s;">
+        <div class="flex">
+          <div class="relative w-28 h-28 flex-shrink-0">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face" alt="" class="w-full h-full object-cover">
+            <div class="absolute top-2 left-2 bg-secondary-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">82% 匹配</div>
+          </div>
+          <div class="flex-1 p-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">伟明</h3>
+                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">32岁 · 成都 · 3周前匹配</p>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">最近工作比较忙，改天再聊</p>
+            <div class="flex items-center gap-2 mt-1">
+              <button class="flex-1 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium rounded-lg transition-colors">聊天</button>
+              <button class="px-3 py-1.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">资料</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-4"></div>
+    </main>
+
+    <!-- 底部导航 -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#1A1A1A]/90 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 max-w-md mx-auto">
+      <div class="flex items-center justify-around py-2">
+        <button class="flex flex-col items-center gap-1 px-4 py-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span class="text-[10px] font-medium text-gray-400 dark:text-gray-500">首页</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 px-4 py-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span class="text-[10px] font-medium text-gray-400 dark:text-gray-500">发现</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 px-4 py-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors relative">
+          <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+          <span class="text-[10px] font-medium text-gray-400 dark:text-gray-500">消息</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 px-4 py-1 rounded-xl bg-primary-50 dark:bg-primary-900/20">
+          <svg class="w-6 h-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          <span class="text-[10px] font-medium text-primary-500">匹配</span>
+        </button>
+      </div>
+      <div class="h-safe-area-inset-bottom"></div>
+    </nav>
+
+  </div>
+
+  <button onclick="document.documentElement.classList.toggle('dark')" class="fixed bottom-24 right-4 z-50 w-12 h-12 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition-transform">🌓</button>
+
+  <style>
+    .h-safe-area-inset-bottom { height: env(safe-area-inset-bottom, 0px); }
+    @media (min-width: 640px) { body { background: #E5E7EB; } .dark body { background: #111827; } }
+  </style>
+</body>
+</html>

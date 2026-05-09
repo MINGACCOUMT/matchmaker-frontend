@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -17,7 +17,7 @@ import {
   Users,
   Eye,
 } from 'lucide-react';
-import { getMe, updateMe } from '@/lib/api';
+import { getMe, updateMe, uploadAvatar } from '@/lib/api';
 import BottomNav from '@/components/BottomNav';
 
 /* ------------------------------------------------------------------ */
@@ -75,6 +75,27 @@ function avatarUrl(src?: string): string {
     src ||
     'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'
   );
+}
+
+type ApiRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is ApiRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function getUploadedAvatarUrl(value: unknown): string | null {
+  if (!isRecord(value)) return null;
+
+  const directUrl = value.avatar_url ?? value.url;
+  if (typeof directUrl === 'string' && directUrl) return directUrl;
+
+  const nestedData = value.data;
+  if (isRecord(nestedData)) {
+    const nestedUrl = nestedData.avatar_url ?? nestedData.url;
+    if (typeof nestedUrl === 'string' && nestedUrl) return nestedUrl;
+  }
+
+  return null;
 }
 
 function deriveAge(birthDate?: string): number | null {
@@ -222,6 +243,7 @@ export default function Profile() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Partial<ProfileData>>({});
   const [loading, setLoading] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -442,12 +464,14 @@ export default function Profile() {
               title="隐私设置"
               desc="谁可以看到我的资料"
               color="bg-secondary-50 dark:bg-secondary-900/20 text-secondary-500"
+              onClick={() => navigate('/settings')}
             />
             <SettingsItem
               icon={Bell}
               title="通知设置"
               desc="消息提醒、匹配通知"
               color="bg-amber-50 dark:bg-amber-900/20 text-amber-500"
+              onClick={() => navigate('/settings')}
             />
             <SettingsItem
               icon={HelpCircle}
@@ -497,14 +521,41 @@ export default function Profile() {
                   placeholder="城市"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
                 />
-                <input
-                  value={form.avatar_url || ''}
-                  onChange={(e) =>
-                    setForm({ ...form, avatar_url: e.target.value })
-                  }
-                  placeholder="头像链接"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
-                />
+                <div className="flex items-center gap-3">
+                  <input
+                    value={form.avatar_url || ''}
+                    onChange={(e) =>
+                      setForm({ ...form, avatar_url: e.target.value })
+                    }
+                    placeholder="头像链接"
+                    className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-4 py-3 rounded-xl bg-primary-500 text-white font-medium"
+                  >
+                    上传
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        const data = await uploadAvatar(file);
+                        const avatarUrl = getUploadedAvatarUrl(data);
+                        if (avatarUrl) {
+                          setForm({ ...form, avatar_url: avatarUrl });
+                        }
+                      } catch {
+                        // silent fail
+                      }
+                    }}
+                  />
+                </div>
                 <textarea
                   value={form.bio || ''}
                   onChange={(e) =>

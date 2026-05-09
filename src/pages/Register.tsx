@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -14,7 +14,7 @@ import {
   Plus,
   Heart,
 } from 'lucide-react';
-import { register } from '@/lib/api';
+import { register, uploadAvatar } from '@/lib/api';
 import Toast from '@/components/ui/Toast';
 
 type ApiRecord = Record<string, unknown>;
@@ -47,6 +47,21 @@ function getAuthUser(value: unknown) {
   if (isRecord(value.user)) return value.user;
   if (isRecord(value.data) && isRecord(value.data.user)) return value.data.user;
   if (isRecord(value.profile)) return value.profile;
+
+  return null;
+}
+
+function getUploadedAvatarUrl(value: unknown): string | null {
+  if (!isRecord(value)) return null;
+
+  const directUrl = value.avatar_url ?? value.url;
+  if (typeof directUrl === 'string' && directUrl) return directUrl;
+
+  const nestedData = value.data;
+  if (isRecord(nestedData)) {
+    const nestedUrl = nestedData.avatar_url ?? nestedData.url;
+    if (typeof nestedUrl === 'string' && nestedUrl) return nestedUrl;
+  }
 
   return null;
 }
@@ -105,6 +120,7 @@ export default function Register() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [toast, setToast] = useState({
     visible: false,
     message: '',
@@ -121,6 +137,27 @@ export default function Register() {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const data = await uploadAvatar(file);
+      const avatarUrl = getUploadedAvatarUrl(data);
+
+      if (!avatarUrl) {
+        throw new Error('头像上传成功，但未返回头像地址');
+      }
+
+      setForm((prev) => ({ ...prev, avatar_url: avatarUrl }));
+      setToast({ visible: true, message: '头像上传成功', variant: 'success' });
+    } catch (err: any) {
+      setToast({ visible: true, message: err.message || '头像上传失败', variant: 'error' });
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -220,7 +257,11 @@ export default function Register() {
             {/* Avatar upload */}
             <div className="flex flex-col items-center">
               <div className="relative">
-                <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-50 dark:bg-gray-800 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-50 dark:bg-gray-800 overflow-hidden"
+                >
                   {form.avatar_url ? (
                     <img
                       src={form.avatar_url}
@@ -230,13 +271,21 @@ export default function Register() {
                   ) : (
                     <Camera className="w-8 h-8 text-gray-400" />
                   )}
-                </div>
+                </button>
                 <button
                   type="button"
+                  onClick={() => fileInputRef.current?.click()}
                   className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center shadow-lg"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
               </div>
               <input
                 type="text"

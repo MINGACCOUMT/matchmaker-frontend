@@ -1,6 +1,6 @@
 "use client";
 
-const API_URL = 'http://localhost:8000';
+export const API_URL = 'http://localhost:8000';
 
 type ApiRecord = Record<string, unknown>;
 
@@ -144,4 +144,53 @@ export async function sendMessage(convId: string, content: string) {
 
 export async function getConversations() {
   return apiFetch('/api/chat/conversations');
+}
+
+export async function uploadAvatar(file: File) {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API_URL}/api/upload/avatar`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  return res.json();
+}
+
+export async function sendImageMessage(convId: string, file: File) {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('chat_id', convId);
+
+  const res = await fetch(`${API_URL}/api/upload/image`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error('上传失败');
+  return res.json(); // { image_url: "..." }
+}
+
+export async function forgotPassword(email: string) {
+  return apiFetch('/api/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
 }

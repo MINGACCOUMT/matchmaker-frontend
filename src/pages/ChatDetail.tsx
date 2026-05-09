@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, MoreVertical, Image, Send, Check } from 'lucide-react';
-import { getMessages, sendMessage, getWsUrl } from '@/lib/api';
+import { getMessages, sendMessage, getWsUrl, sendImageMessage } from '@/lib/api';
 import BottomNav from '@/components/BottomNav';
 
 /* ------------------------------------------------------------------ */
@@ -16,6 +16,7 @@ interface Message {
   sender_avatar?: string;
   content: string;
   created_at: string;
+  has_media?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -116,7 +117,17 @@ function MessageBubble({
               : 'bg-white dark:bg-[#1A1A1A] text-gray-800 dark:text-gray-100 rounded-2xl rounded-bl-sm shadow-sm'
           }`}
         >
-          <p>{msg.content}</p>
+          {msg.has_media || (msg.content && (msg.content.startsWith('http') && (/\.(jpg|jpeg|png|gif|webp)$/i).test(msg.content))) ? (
+            <img
+              src={msg.content}
+              alt="图片"
+              className="max-w-[200px] max-h-[200px] rounded-lg object-cover cursor-pointer"
+              onClick={() => window.open(msg.content, '_blank')}
+              loading="lazy"
+            />
+          ) : (
+            <p>{msg.content}</p>
+          )}
         </div>
 
         {/* Time + read status */}
@@ -159,6 +170,7 @@ export default function ChatDetail() {
   const [myId, setMyId] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttemptsRef = useRef(0);
 
@@ -296,6 +308,33 @@ export default function ChatDetail() {
     }
   };
 
+  const handleImageSend = async (file: File) => {
+    if (!convId) return;
+    try {
+      const data = await sendImageMessage(convId, file);
+      const imageUrl = data?.image_url ?? data?.url ?? data?.data?.image_url ?? data?.data?.url;
+      if (!imageUrl) throw new Error('上传失败');
+
+      const optimistic: Message = {
+        id: Date.now(),
+        sender_id: myId,
+        content: imageUrl,
+        created_at: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, optimistic]);
+
+      const ws = wsRef.current;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'message', content: imageUrl, has_media: true }));
+      } else {
+        await sendMessage(convId, imageUrl);
+        loadMessages();
+      }
+    } catch (err: any) {
+      alert(err.message || '图片发送失败');
+    }
+  };
+
   // Group messages by date for dividers
   const groupedMessages = messages.reduce<{ date: string; items: Message[] }[]>((acc, msg) => {
     const date = new Date(msg.created_at).toDateString();
@@ -392,8 +431,20 @@ export default function ChatDetail() {
           onSubmit={handleSend}
           className="bg-white/90 dark:bg-[#1A1A1A]/90 backdrop-blur border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex items-center gap-2"
         >
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImageSend(file);
+              e.target.value = '';
+            }}
+          />
           <button
             type="button"
+            onClick={() => fileInputRef.current?.click()}
             className="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0"
           >
             <Image className="w-5 h-5" />
