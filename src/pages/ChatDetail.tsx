@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, MoreVertical, Image, Send, Check } from 'lucide-react';
-import { getMessages, sendMessage } from '@/lib/api';
+import { getMessages, sendMessage, getWsUrl } from '@/lib/api';
 import BottomNav from '@/components/BottomNav';
 
 /* ------------------------------------------------------------------ */
@@ -154,9 +154,13 @@ export default function ChatDetail() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
   const [otherUser, setOtherUser] = useState<{ nickname?: string; avatar_url?: string; online?: boolean } | null>(null);
   const [myId, setMyId] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectAttemptsRef = useRef(0);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -167,13 +171,72 @@ export default function ChatDetail() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     setMyId(user.id || 0);
     loadMessages();
-    const interval = setInterval(loadMessages, 5000);
-    return () => clearInterval(interval);
+    if (!convId) return;
+    const ws = new WebSocket(getWsUrl(convId));
+    wsRef.current = ws;
+    ws.onopen = () => {};
+    ws.onmessage = (event) => {
+      const parsed = JSON.parse(event.data);
+      if (parsed.type === 'message') {
+        setMessages((prev) => [...prev, parsed]);
+      }
+      if (parsed.type === 'user_online') {
+        setOtherUser((prev) => (prev ? { ...prev, online: true } : prev));
+      }
+      if (parsed.type === 'user_offline') {
+        setOtherUser((prev) => (prev ? { ...prev, online: false } : prev));
+      }
+    };
+    ws.onerror = () => {};
+    ws.onclose = () => {
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+      }
+      // Auto reconnect: max 3 attempts, 3s interval
+      if (reconnectAttemptsRef.current < 3) {
+        reconnectAttemptsRef.current++;
+        setTimeout(() => {
+          if (convId) {
+            const newWs = new WebSocket(getWsUrl(convId));
+            wsRef.current = newWs;
+          }
+        }, 3000);
+      }
+    };
+    return () => {
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+      }
+      ws.close();
+    };
   }, [convId, navigate]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (!convId) return;
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN || input.length === 0) {
+      setIsTyping(false);
+      return;
+    }
+
+    ws.send(JSON.stringify({ type: 'typing', typing: true }));
+    setIsTyping(true);
+
+    const timeout = window.setTimeout(() => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: 'typing', typing: false }));
+      }
+      setIsTyping(false);
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [convId, input]);
 
   const loadMessages = async () => {
     if (!convId) return;
@@ -211,6 +274,19 @@ export default function ChatDetail() {
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, optimistic]);
+
+    // Try WebSocket first
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      try {
+        ws.send(JSON.stringify({ type: 'message', content: text }));
+        return;
+      } catch {
+        // fallback to REST
+      }
+    }
+
+    // Fallback to REST
     try {
       await sendMessage(convId, text);
       loadMessages();
@@ -259,11 +335,11 @@ export default function ChatDetail() {
               >
                 {otherUser?.nickname || '聊天'}
               </div>
-              <div className="text-xs text-success flex items-center gap-1"
+              <div className={`text-xs flex items-center gap-1 ${otherUser?.online !== false ? 'text-success' : 'text-gray-400'}`}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-success"
+                <span className={`w-1.5 h-1.5 rounded-full ${otherUser?.online !== false ? 'bg-success' : 'bg-gray-400'}`}
                 />
-                在线
+                {otherUser?.online !== false ? '在线' : '离线'}
               </div>
             </div>
           </div>

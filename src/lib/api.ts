@@ -11,6 +11,17 @@ function getToken() {
   return null;
 }
 
+export function getWsUrl(chatId: string): string {
+  const token: string | null = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const wsBaseUrl: string = API_URL.startsWith('https://')
+    ? API_URL.replace('https://', 'wss://')
+    : API_URL.startsWith('http://')
+      ? API_URL.replace('http://', 'ws://')
+      : API_URL;
+
+  return `${wsBaseUrl}/api/ws/chat/${chatId}?token=${token ?? ''}`;
+}
+
 function isRecord(value: unknown): value is ApiRecord {
   return typeof value === 'object' && value !== null;
 }
