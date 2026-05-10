@@ -35,6 +35,8 @@ interface ProfileData {
   gender?: number;
   occupation?: string;
   tags?: string;
+  phone?: string;
+  address?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -264,6 +266,11 @@ export default function Profile() {
         bio: me.bio || '',
         city: me.city || '',
         avatar_url: me.avatar_url || '',
+        gender: me.gender !== undefined ? String(me.gender) : '',
+        phone: me.phone || '',
+        address: me.address || '',
+        occupation: me.occupation || '',
+        birth_date: me.birth_date || '',
       });
     } catch {
       // silent
@@ -521,6 +528,33 @@ export default function Profile() {
                   placeholder="城市"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
                 />
+                <input
+                  value={form.phone || ''}
+                  onChange={(e) =>
+                    setForm({ ...form, phone: e.target.value })
+                  }
+                  placeholder="电话"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
+                />
+                <input
+                  value={form.address || ''}
+                  onChange={(e) =>
+                    setForm({ ...form, address: e.target.value })
+                  }
+                  placeholder="地址"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
+                />
+                <select
+                  value={form.gender || ''}
+                  onChange={(e) =>
+                    setForm({ ...form, gender: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
+                >
+                  <option value="" className="dark:bg-gray-800 dark:text-white">选择性别</option>
+                  <option value="0" className="dark:bg-gray-800 dark:text-white">女</option>
+                  <option value="1" className="dark:bg-gray-800 dark:text-white">男</option>
+                </select>
                 <div className="flex items-center gap-3">
                   <input
                     value={form.avatar_url || ''}
@@ -564,6 +598,23 @@ export default function Profile() {
                   placeholder="个人介绍"
                   rows={3}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30 resize-none"
+                />
+                <input
+                  value={form.occupation || ''}
+                  onChange={(e) =>
+                    setForm({ ...form, occupation: e.target.value })
+                  }
+                  placeholder="职业"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
+                />
+                <input
+                  type="date"
+                  value={form.birth_date || ''}
+                  onChange={(e) =>
+                    setForm({ ...form, birth_date: e.target.value })
+                  }
+                  placeholder="出生日期"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500/30"
                 />
               </div>
               <div className="flex gap-3">
